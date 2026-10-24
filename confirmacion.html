@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido Confirmado</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .card {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+            text-align: center;
+        }
+
+        .icono {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            color: #28a745;
+            margin-bottom: 25px;
+        }
+
+        .info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .info p {
+            margin: 10px 0;
+            font-size: 17px;
+        }
+
+        .etiqueta {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .total {
+            color: #ff7b00;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .botones {
+            margin-top: 25px;
+        }
+
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin: 5px;
+            font-weight: bold;
+            transition: .2s;
+        }
+
+        .btn-principal {
+            background: #ff7b00;
+            color: white;
+        }
+
+        .btn-principal:hover {
+            background: #e66f00;
+        }
+
+        .btn-secundario {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .btn-secundario:hover {
+            background: #dfe3e6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+
+        <div class="icono">✅</div>
+
+        <h1>Pedido Registrado</h1>
+
+        <div class="info">
+
+            <p>
+                <span class="etiqueta">Cliente:</span>
+                <strong id="cliente"></strong>
+            </p>
+
+            <p>
+                <span class="etiqueta">Total:</span>
+                <span class="total" id="total"></span>
+            </p>
+
+        </div>
+
+        <div class="botones">
+
+            <a href="index.html" class="btn btn-principal">
+                Nuevo Pedido
+            </a>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        const pedido =
+            JSON.parse(
+                localStorage.getItem("ultimoPedido")
+            );
+
+        if (pedido) {
+
+            document.getElementById("cliente").textContent =
+                pedido.cliente;
+
+            document.getElementById("total").textContent =
+                "$" + pedido.total;
+        }
+
+    </script>
+
+</body>
+
+</html>

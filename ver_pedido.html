@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+
+<title>Detalle del Pedido</title>
+
+<style>
+
+body{
+    font-family:Segoe UI,Arial;
+    background:#f4f4f4;
+    padding:30px;
+}
+
+.card{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+pre{
+    white-space:pre-wrap;
+}
+
+a{
+    display:inline-block;
+    margin-top:20px;
+    background:#ff7b00;
+    color:white;
+    text-decoration:none;
+    padding:10px 15px;
+    border-radius:8px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<h1 id="titulo"></h1>
+
+<pre id="contenido"></pre>
+
+<a href="admin.html">
+Volver
+</a>
+
+</div>
+
+<script>
+
+const indice =
+localStorage.getItem("pedido_ver");
+
+const pedidos =
+JSON.parse(
+localStorage.getItem("pedidos")
+) || [];
+
+const pedido =
+pedidos[indice];
+
+if(pedido){
+
+    document.getElementById("titulo")
+        .textContent =
+        "🧾 Pedido de " +
+        pedido.cliente;
+
+    document.getElementById("contenido")
+        .textContent =
+        pedido.detalle;
+}
+
+</script>
+
+</body>
+</html>

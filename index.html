@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vualas - Pedidos</title>
+
+    <style>
+        body {
+            font-family: Segoe UI, Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff7b00;
+        }
+
+        .cliente {
+            max-width: 500px;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .cliente input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        .productos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .10);
+        }
+
+        .card img {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .precio {
+            font-weight: bold;
+            color: #ff7b00;
+            margin: 10px 0;
+        }
+
+        .cantidad {
+            width: 80px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .acciones {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        button {
+            background: #ff7b00;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #e06600;
+        }
+
+        .admin {
+            margin-left: 15px;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🧁 Pedidos Vualas</h1>
+
+    <div class="cliente">
+        <input
+            type="text"
+            id="cliente"
+            placeholder="Nombre del cliente">
+    </div>
+
+    <div class="productos">
+
+        <div class="card">
+            <img src="static/Imagenes/Cajeta.jpg" alt="">
+            <h3>Vualá Cajeta Individual</h3>
+            <div class="precio">$17</div>
+            <input class="cantidad" type="number" id="cajeta_ind" min="0" value="0">
+        </div>
+
+        <div class="card">
+            <img src="static/Imagenes/Cajeta.jpg" alt="">
+            <h3>Vualá Cajeta Tira</h3>
+            <div class="precio">$100</div>
+            <input class="cantidad" type="number" id="cajeta_tira" min="0" value="0">
+        </div>
+
+        <div class="card">
+            <img src="static/Imagenes/Vainilla.jpg" alt="">
+            <h3>Vualá Vainilla Individual</h3>
+            <div class="precio">$17</div>
+            <input class="cantidad" type="number" id="vainilla_ind" min="0" value="0">
+        </div>
+
+        <div class="card">
+            <img src="static/Imagenes/Vainilla.jpg" alt="">
+            <h3>Vualá Vainilla Tira</h3>
+            <div class="precio">$100</div>
+            <input class="cantidad" type="number" id="vainilla_tira" min="0" value="0">
+        </div>
+
+        <div class="card">
+            <img src="static/Imagenes/Chocolate.jpg" alt="">
+            <h3>Vualá Chocolate Individual</h3>
+            <div class="precio">$17</div>
+            <input class="cantidad" type="number" id="chocolate_ind" min="0" value="0">
+        </div>
+
+        <div class="card">
+            <img src="static/Imagenes/Chocolate.jpg" alt="">
+            <h3>Vualá Chocolate Tira</h3>
+            <div class="precio">$100</div>
+            <input class="cantidad" type="number" id="chocolate_tira" min="0" value="0">
+        </div>
+
+        <div class="card">
+            <img src="static/Imagenes/Prispas.jpg" alt="">
+            <h3>Prispas</h3>
+            <div class="precio">$5</div>
+            <input class="cantidad" type="number" id="prispas" min="0" value="0">
+        </div>
+
+        <div class="card">
+            <img src="static/Imagenes/Chetos-Extreme.jpg" alt="">
+            <h3>Chetos Extreme</h3>
+            <div class="precio">$15</div>
+            <input class="cantidad" type="number" id="extreme" min="0" value="0">
+        </div>
+
+        <div class="card">
+            <img src="static/Imagenes/Chetos-Spicante.jpg" alt="">
+            <h3>Chetos Spicante</h3>
+            <div class="precio">$22</div>
+            <input class="cantidad" type="number" id="spicante" min="0" value="0">
+        </div>
+
+        <div class="card">
+            <img src="static/Imagenes/Chetos-Queso.jpg" alt="">
+            <h3>Chetos Queso</h3>
+            <div class="precio">$17</div>
+            <input class="cantidad" type="number" id="queso" min="0" value="0">
+        </div>
+
+    </div>
+
+    <div class="acciones">
+
+        <button onclick="crearPedido()">
+            Realizar Pedido
+        </button>
+
+    </div>
+
+    <script src="static/js/app.js"></script>
