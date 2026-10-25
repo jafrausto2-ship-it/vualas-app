@@ -22,7 +22,6 @@ const URL_GOOGLE_SHEETS =
 // Guarda el pedido en el navegador y lo envía a Google Sheets
 async function guardarPedido(cliente, productos, total, detalle) {
     const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
-
     const pedido = {
         id: Date.now(),
         cliente: cliente,
