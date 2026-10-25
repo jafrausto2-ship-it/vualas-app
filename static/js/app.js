@@ -16,7 +16,7 @@ const PRODUCTOS = [
 ];
 
 const URL_GOOGLE_SHEETS =
-    "https://script.google.com/macros/s/AKfycbzKyj9vNQ1qSFShEF41Mzby11Rq02YY8IjP2oWmElGe7b1cdfjbFqtJZxRGyFTbetKXJQ/exec";
+    "https://script.google.com/macros/s/AKfycbzgajAV7KXScTqtH1PE7EQXbOqa29unuxdFQkhJ5WURUewTrpwGv6cwK4S4nt74FTzuKw/exec";
 
 
 // Guarda el pedido en el navegador y lo envía a Google Sheets
