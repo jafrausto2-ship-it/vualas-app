@@ -165,7 +165,19 @@
 
     <section class="panel">
         <h2>📦 Resumen por producto</h2>
-        <p>Unidades solicitadas en todos los pedidos registrados.</p>
+    <div class="panel">
+        <h2>🧾 Total general de pedidos</h2>
+        <p>
+            <strong id="totalGeneral">$0.00</strong>
+        </p>
+        <p>
+            Pedidos registrados:
+            <strong id="cantidadPedidos">0</strong>
+        </p>
+    </div>        
+
+
+<p>Unidades solicitadas en todos los pedidos registrados.</p>
         <div id="resumen" class="resumen">
             <p>Cargando resumen...</p>
         </div>
@@ -356,6 +368,20 @@
                     );
                 });
             });
+
+            const totalGeneral = pedidos.reduce(
+                (suma, pedido) => suma + Number(pedido.total || 0),
+                0
+            );
+
+            document.getElementById("totalGeneral").textContent =
+                totalGeneral.toLocaleString("es-MX", {
+                    style: "currency",
+                    currency: "MXN"
+                });
+
+            document.getElementById("cantidadPedidos").textContent =
+                pedidos.length;
 
             const resumen = document.getElementById("resumen");
             resumen.replaceChildren();
