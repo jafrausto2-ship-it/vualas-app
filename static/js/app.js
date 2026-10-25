@@ -15,7 +15,6 @@ const PRODUCTOS = [
     { id: "queso", nombre: "Chetos Queso", precio: 17, imagen: "Chetos-Queso.jpg" }
 ];
 
-// URL de tu aplicación de Google Apps Script
 const URL_GOOGLE_SHEETS =
     "https://script.google.com/macros/s/AKfycbzKyj9vNQ1qSFShEF41Mzby11Rq02YY8IjP2oWmElGe7b1cdfjbFqtJZxRGyFTbetKXJQ/exec";
 
@@ -33,13 +32,12 @@ async function guardarPedido(cliente, productos, total, detalle) {
         detalle: detalle
     };
 
-    // Guardar una copia en este navegador
     pedidos.push(pedido);
+
     localStorage.setItem("pedidos", JSON.stringify(pedidos));
     localStorage.setItem("ultimoPedido", JSON.stringify(pedido));
 
-    // Enviar el pedido a Google Sheets
-    await enviarAGoogleSheets(pedido);
+    enviarAGoogleSheets(pedido);
 
     return pedido;
 }
@@ -63,6 +61,7 @@ async function crearPedido() {
 
     let total = 0;
     let hayProductos = false;
+
     let detalle = `PEDIDO
 
 Cliente: ${cliente}
@@ -108,35 +107,53 @@ PRODUCTOS
     try {
         await guardarPedido(cliente, productosPedido, total, detalle);
 
-        // El envío fue iniciado; Google Apps Script puede procesarlo
-        // aunque el navegador no permita leer su respuesta por CORS.
-        window.location.href = "confirmacion.html";
+        // Dar tiempo para iniciar el envío antes de cambiar de página.
+        // Esto no garantiza que Google ya haya guardado el pedido.
+        setTimeout(() => {
+            window.location.href = "confirmacion.html";
+        }, 1000);
 
     } catch (error) {
-        console.error("Error al enviar el pedido:", error);
-
-        alert(
-            "No se pudo completar el envío. " +
-            "Revisa tu conexión e inténtalo de nuevo."
-        );
+        console.error("Error al crear el pedido:", error);
+        alert("Ocurrió un problema al preparar el pedido.");
     }
 }
 
 
-// Envía el pedido a Google Sheets
-async function enviarAGoogleSheets(pedido) {
-    const respuesta = await fetch(URL_GOOGLE_SHEETS, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(pedido)
-    });
+// Envía el pedido mediante un formulario oculto a Google Apps Script
+function enviarAGoogleSheets(pedido) {
+    let iframe = document.getElementById("googleSheetsFrame");
 
-    // Con mode: no-cors, el navegador no permite leer la respuesta.
-    // Por eso hay que verificar en Google Sheets si se agregó la fila.
-    return respuesta;
+    if (!iframe) {
+        iframe = document.createElement("iframe");
+        iframe.name = "googleSheetsFrame";
+        iframe.id = "googleSheetsFrame";
+        iframe.style.display = "none";
+        document.body.appendChild(iframe);
+    }
+
+    const formulario = document.createElement("form");
+
+    formulario.method = "POST";
+    formulario.action = URL_GOOGLE_SHEETS;
+    formulario.target = "googleSheetsFrame";
+    formulario.style.display = "none";
+
+    const campo = document.createElement("input");
+
+    campo.type = "hidden";
+    campo.name = "payload";
+    campo.value = JSON.stringify(pedido);
+
+    formulario.appendChild(campo);
+    document.body.appendChild(formulario);
+
+    formulario.submit();
+
+    // Eliminar el formulario después de enviarlo.
+    setTimeout(() => {
+        formulario.remove();
+    }, 3000);
 }
 
 
@@ -209,7 +226,7 @@ function eliminarPedido(index) {
 }
 
 
-// Muestra el detalle del último pedido
+// Muestra el detalle del pedido seleccionado
 function mostrarDetallePedido() {
     const contenedor = document.getElementById("detallePedido");
 
@@ -234,3 +251,4 @@ document.addEventListener("DOMContentLoaded", () => {
     mostrarPedidos();
     mostrarDetallePedido();
 });
+
