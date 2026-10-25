@@ -14,7 +14,7 @@
             color: #333;
         }
 
-        h1 { color: #ff7b00; }
+        h1, h2 { color: #ff7b00; }
 
         .barra {
             display: flex;
@@ -40,7 +40,19 @@
             cursor: wait;
         }
 
+        .btn-eliminar { background: #c62828; }
+        .btn-cancelar { background: #666; }
+        .btn-guardar { background: #238636; }
+
         #estado { color: #555; }
+
+        .panel {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+            box-shadow: 0 1px 4px #ddd;
+        }
 
         .tabla-contenedor {
             overflow-x: auto;
@@ -75,8 +87,58 @@
 
         .detalle {
             white-space: pre-wrap;
-            min-width: 240px;
-            text-align: left;
+            min-width: 220px;
+        }
+
+        .acciones {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            min-width: 145px;
+        }
+
+        .acciones button { padding: 8px 10px; }
+
+        .resumen {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .producto {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fffaf5;
+        }
+
+        .cantidad {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff7b00;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: 600;
+        }
+
+        input, textarea {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font: inherit;
+        }
+
+        .form-acciones {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            flex-wrap: wrap;
         }
 
         .volver {
@@ -101,6 +163,41 @@
         <span id="estado">Consultando Google Sheets...</span>
     </div>
 
+    <section class="panel">
+        <h2>📦 Resumen por producto</h2>
+        <p>Unidades solicitadas en todos los pedidos registrados.</p>
+        <div id="resumen" class="resumen">
+            <p>Cargando resumen...</p>
+        </div>
+    </section>
+
+    <section id="panelEdicion" class="panel" hidden>
+        <h2>✏️ Editar pedido</h2>
+        <p>Si cambias el detalle, usa el formato: cantidad x producto = $subtotal.</p>
+
+        <form id="formEdicion">
+            <input type="hidden" id="filaPedido">
+
+            <label for="fechaPedido">Fecha y hora</label>
+            <input id="fechaPedido" type="text" required>
+
+            <label for="clientePedido">Cliente</label>
+            <input id="clientePedido" type="text" required>
+
+            <label for="totalPedido">Total ($)</label>
+            <input id="totalPedido" type="number" min="0" step="0.01" required>
+
+            <label for="detallePedido">Detalle del pedido</label>
+            <textarea id="detallePedido" rows="6" required></textarea>
+
+            <div class="form-acciones">
+                <button type="submit" class="btn-guardar">Guardar cambios</button>
+                <button type="button" class="btn-cancelar"
+                        onclick="cancelarEdicion()">Cancelar</button>
+            </div>
+        </form>
+    </section>
+
     <div class="tabla-contenedor">
         <table>
             <thead>
@@ -109,12 +206,11 @@
                     <th>Cliente</th>
                     <th>Total</th>
                     <th>Detalle</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody id="tablaPedidos">
-                <tr>
-                    <td colspan="4">Cargando pedidos...</td>
-                </tr>
+                <tr><td colspan="5">Cargando pedidos...</td></tr>
             </tbody>
         </table>
     </div>
@@ -122,8 +218,25 @@
     <a class="volver" href="index.html">Volver al catálogo</a>
 
     <script>
-const URL_GOOGLE_SHEETS =
+        const URL_GOOGLE_SHEETS =
+            
 "https://script.google.com/macros/s/AKfycbzgajAV7KXScTqtH1PE7EQXbOqa29unuxdFQkhJ5WURUewTrpwGv6cwK4S4nt74FTzuKw/exec";
+
+        let pedidosActuales = [];
+
+        function crearCelda(texto, clase = "") {
+            const celda = document.createElement("td");
+            celda.textContent = texto;
+            if (clase) celda.className = clase;
+            return celda;
+        }
+
+        function fechaLegible(fecha) {
+            if (!fecha) return "";
+
+            // La fecha que devuelve Apps Script ya está formateada.
+            return fecha;
+        }
 
         async function cargarPedidos() {
             const boton = document.getElementById("actualizar");
@@ -132,14 +245,6 @@ const URL_GOOGLE_SHEETS =
 
             boton.disabled = true;
             estado.textContent = "Consultando pedidos...";
-
-            tabla.replaceChildren();
-            const filaCarga = document.createElement("tr");
-            const celdaCarga = document.createElement("td");
-            celdaCarga.colSpan = 4;
-            celdaCarga.textContent = "Cargando...";
-            filaCarga.appendChild(celdaCarga);
-            tabla.appendChild(filaCarga);
 
             try {
                 const respuesta = await fetch(
@@ -158,55 +263,227 @@ const URL_GOOGLE_SHEETS =
                     );
                 }
 
+                pedidosActuales = pedidos;
                 tabla.replaceChildren();
 
                 if (pedidos.length === 0) {
-                    const fila = document.createElement("tr");
-                    const celda = document.createElement("td");
-                    celda.colSpan = 4;
-                    celda.textContent = "Todavía no hay pedidos.";
-                    fila.appendChild(celda);
-                    tabla.appendChild(fila);
+                    tabla.appendChild(crearFilaMensaje(
+                        "Todavía no hay pedidos."
+                    ));
                 } else {
                     pedidos.slice().reverse().forEach(pedido => {
                         const fila = document.createElement("tr");
 
-                        [
-                            pedido.fecha || "",
-                            pedido.cliente || "",
-                            "$" + Number(pedido.total || 0).toFixed(2)
-                        ].forEach((valor, indice) => {
-                            const celda = document.createElement("td");
-                            celda.textContent = valor;
-                            if (indice === 2) celda.className = "total";
-                            fila.appendChild(celda);
-                        });
+                        fila.appendChild(crearCelda(
+                            fechaLegible(pedido.fecha)
+                        ));
+                        fila.appendChild(crearCelda(pedido.cliente || ""));
+                        fila.appendChild(crearCelda(
+                            "$" + Number(pedido.total || 0).toFixed(2),
+                            "total"
+                        ));
+                        fila.appendChild(crearCelda(
+                            pedido.detalle || "", "detalle"
+                        ));
 
-                        const celdaDetalle = document.createElement("td");
-                        celdaDetalle.className = "detalle";
-                        celdaDetalle.textContent = pedido.detalle || "";
-                        fila.appendChild(celdaDetalle);
+                        const acciones = crearCelda();
+                        acciones.className = "acciones";
 
+                        const editar = document.createElement("button");
+                        editar.textContent = "Editar";
+                        editar.onclick = () => iniciarEdicion(pedido);
+
+                        const eliminar = document.createElement("button");
+                        eliminar.textContent = "Eliminar";
+                        eliminar.className = "btn-eliminar";
+                        eliminar.onclick = () => eliminarPedido(pedido);
+
+                        acciones.append(editar, eliminar);
+                        fila.appendChild(acciones);
                         tabla.appendChild(fila);
                     });
                 }
 
+                generarResumen(pedidos);
+
                 estado.textContent =
-                    pedidos.length + " pedido(s) consultado(s) desde Google Sheets.";
+                    pedidos.length + " pedido(s) consultado(s).";
+
             } catch (error) {
                 tabla.replaceChildren();
-                const fila = document.createElement("tr");
-                const celda = document.createElement("td");
-                celda.colSpan = 4;
-                celda.textContent =
-                    "No se pudieron cargar los pedidos. " +
-                    error.message +
-                    " Si aparece un error de acceso, revisaremos la conexión entre GitHub Pages y Apps Script.";
-                fila.appendChild(celda);
-                tabla.appendChild(fila);
+                tabla.appendChild(crearFilaMensaje(
+                    "No se pudieron cargar los pedidos: " + error.message
+                ));
                 estado.textContent = "Error al consultar Google Sheets.";
             } finally {
                 boton.disabled = false;
+            }
+        }
+
+        function crearFilaMensaje(mensaje) {
+            const fila = document.createElement("tr");
+            const celda = crearCelda(mensaje);
+            celda.colSpan = 5;
+            fila.appendChild(celda);
+            return fila;
+        }
+
+        function generarResumen(pedidos) {
+            const cantidades = new Map();
+
+            pedidos.forEach(pedido => {
+                const detalle = pedido.detalle || "";
+                const lineas = detalle.split(/\r?\n/);
+
+                lineas.forEach(linea => {
+                    // Ejemplo: 2 x Chetos Extreme = $30
+                    const coincidencia = linea.match(
+                        /^\s*(\d+(?:[.,]\d+)?)\s*x\s*(.+?)\s*=\s*\$/
+                    );
+
+                    if (!coincidencia) return;
+
+                    const cantidad = Number(
+                        coincidencia[1].replace(",", ".")
+                    );
+                    const producto = coincidencia[2].trim();
+
+                    if (!producto || !Number.isFinite(cantidad)) return;
+
+                    cantidades.set(
+                        producto,
+                        (cantidades.get(producto) || 0) + cantidad
+                    );
+                });
+            });
+
+            const resumen = document.getElementById("resumen");
+            resumen.replaceChildren();
+
+            if (cantidades.size === 0) {
+                resumen.textContent =
+                    "No se encontraron cantidades en el formato esperado. " +
+                    "Los detalles deben incluir líneas como: 2 x Chetos Extreme = $30";
+                return;
+            }
+
+            [...cantidades.entries()]
+                .sort((a, b) => a[0].localeCompare(b[0], "es"))
+                .forEach(([producto, cantidad]) => {
+                    const tarjeta = document.createElement("div");
+                    tarjeta.className = "producto";
+
+                    const nombre = document.createElement("div");
+                    nombre.textContent = producto;
+
+                    const numero = document.createElement("div");
+                    numero.className = "cantidad";
+                    numero.textContent = cantidad.toLocaleString("es-MX");
+
+                    const etiqueta = document.createElement("div");
+                    etiqueta.textContent = "unidades";
+
+                    tarjeta.append(nombre, numero, etiqueta);
+                    resumen.appendChild(tarjeta);
+                });
+        }
+
+        function iniciarEdicion(pedido) {
+            if (!pedido.fila) {
+                alert("Este pedido no tiene número de fila. Actualiza la implementación de Apps Script.");
+                return;
+            }
+
+            document.getElementById("filaPedido").value = pedido.fila;
+            document.getElementById("fechaPedido").value = pedido.fecha || "";
+            document.getElementById("clientePedido").value = pedido.cliente || "";
+            document.getElementById("totalPedido").value = Number(pedido.total || 0);
+            document.getElementById("detallePedido").value = pedido.detalle || "";
+
+            document.getElementById("panelEdicion").hidden = false;
+            document.getElementById("panelEdicion").scrollIntoView({
+                behavior: "smooth"
+            });
+        }
+
+        function cancelarEdicion() {
+            document.getElementById("formEdicion").reset();
+            document.getElementById("panelEdicion").hidden = true;
+        }
+
+        async function enviarAccion(datos) {
+            // Apps Script acepta payload como parámetro de formulario.
+            const cuerpo = new URLSearchParams();
+            cuerpo.set("payload", JSON.stringify(datos));
+
+            await fetch(URL_GOOGLE_SHEETS, {
+                method: "POST",
+                mode: "no-cors",
+                body: cuerpo
+            });
+
+            // En modo no-cors el navegador no permite leer la respuesta.
+            // Se vuelve a consultar la hoja para comprobar el resultado.
+        }
+
+        document.getElementById("formEdicion").addEventListener(
+            "submit", async function(event) {
+                event.preventDefault();
+
+                const boton = this.querySelector('[type="submit"]');
+                boton.disabled = true;
+
+                try {
+                    await enviarAccion({
+                        accion: "editar",
+                        fila: Number(document.getElementById("filaPedido").value),
+                        fecha: document.getElementById("fechaPedido").value,
+                        cliente: document.getElementById("clientePedido").value.trim(),
+                        total: Number(document.getElementById("totalPedido").value),
+                        detalle: document.getElementById("detallePedido").value
+                    });
+
+                    cancelarEdicion();
+                    document.getElementById("estado").textContent =
+                        "Solicitud enviada. Verificando cambios...";
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    await cargarPedidos();
+
+                } catch (error) {
+                    alert("No se pudo enviar la solicitud: " + error.message);
+                } finally {
+                    boton.disabled = false;
+                }
+            }
+        );
+
+        async function eliminarPedido(pedido) {
+            if (!pedido.fila) {
+                alert("No se encontró el número de fila de este pedido.");
+                return;
+            }
+
+            const confirmar = confirm(
+                "¿Seguro que deseas eliminar el pedido de " +
+                (pedido.cliente || "este cliente") + "?\n\n" +
+                "Esta acción no se puede deshacer."
+            );
+
+            if (!confirmar) return;
+
+            try {
+                await enviarAccion({
+                    accion: "eliminar",
+                    fila: Number(pedido.fila)
+                });
+
+                document.getElementById("estado").textContent =
+                    "Solicitud enviada. Verificando eliminación...";
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                await cargarPedidos();
+
+            } catch (error) {
+                alert("No se pudo enviar la solicitud: " + error.message);
             }
         }
 
