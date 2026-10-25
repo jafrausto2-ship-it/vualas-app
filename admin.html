@@ -1,89 +1,218 @@
+
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Administración de Pedidos</title>
 
     <style>
         body {
-            font-family: Segoe UI, Arial, sans-serif;
+            font-family: "Segoe UI", Arial, sans-serif;
             margin: 20px;
             background: #f5f5f5;
+            color: #333;
         }
 
-        h1 {
-            color: #ff7b00;
+        h1 { color: #ff7b00; }
+
+        .barra {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        button, .volver {
+            padding: 10px 15px;
+            border: 0;
+            border-radius: 8px;
+            background: #ff7b00;
+            color: white;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        button:disabled {
+            opacity: .6;
+            cursor: wait;
+        }
+
+        #estado { color: #555; }
+
+        .tabla-contenedor {
+            overflow-x: auto;
+            background: white;
+            border-radius: 8px;
         }
 
         table {
             width: 100%;
-            background: white;
             border-collapse: collapse;
+            background: white;
         }
 
         th {
             background: #ff7b00;
             color: white;
-            padding: 10px;
+            padding: 12px;
+            text-align: left;
         }
 
         td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
+            border-bottom: 1px solid #ddd;
+            padding: 12px;
+            vertical-align: top;
         }
 
-        button {
-            padding: 6px 10px;
-            margin: 2px;
-            cursor: pointer;
+        .total {
+            text-align: right;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+
+        .detalle {
+            white-space: pre-wrap;
+            min-width: 240px;
+            text-align: left;
         }
 
         .volver {
             display: inline-block;
             margin-top: 20px;
-            text-decoration: none;
-            background: #ff7b00;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 8px;
+        }
+
+        @media (max-width: 600px) {
+            body { margin: 12px; }
+            th, td { padding: 8px; }
         }
     </style>
-
 </head>
 
 <body>
+    <h1>📋 Pedidos registrados</h1>
 
-    <h1>📋 Pedidos Registrados</h1>
+    <div class="barra">
+        <button id="actualizar" onclick="cargarPedidos()">
+            Actualizar pedidos
+        </button>
+        <span id="estado">Consultando Google Sheets...</span>
+    </div>
 
-    <table>
+    <div class="tabla-contenedor">
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th>Total</th>
+                    <th>Detalle</th>
+                </tr>
+            </thead>
+            <tbody id="tablaPedidos">
+                <tr>
+                    <td colspan="4">Cargando pedidos...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-        <thead>
-            <tr>
-                <th>Cliente</th>
-                <th>Fecha</th>
-                <th>Total</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-
-        <tbody id="tablaPedidos">
-
-        </tbody>
-
-    </table>
-
-    <a class="volver" href="index.html">
-        Volver al catálogo
-    </a>
-
-    <script src="static/js/app.js"></script>
+    <a class="volver" href="index.html">Volver al catálogo</a>
 
     <script>
-        mostrarPedidos();
+        const URL_GOOGLE_SHEETS =
+            
+"https://script.google.com/macros/s/AKfycbzgajAV7KXScTqtH1PE7EQXbOqa29unuxdFQkhJ5WURUewTrpwGv6cwK4S4nt74FTzuKw/exec";
+
+        async function cargarPedidos() {
+            const boton = document.getElementById("actualizar");
+            const estado = document.getElementById("estado");
+            const tabla = document.getElementById("tablaPedidos");
+
+            boton.disabled = true;
+            estado.textContent = "Consultando pedidos...";
+
+            tabla.replaceChildren();
+            const filaCarga = document.createElement("tr");
+            const celdaCarga = document.createElement("td");
+            celdaCarga.colSpan = 4;
+            celdaCarga.textContent = "Cargando...";
+            filaCarga.appendChild(celdaCarga);
+            tabla.appendChild(filaCarga);
+
+            try {
+                const respuesta = await fetch(
+                    URL_GOOGLE_SHEETS + "?accion=pedidos"
+                );
+
+                if (!respuesta.ok) {
+                    throw new Error("Error HTTP " + respuesta.status);
+                }
+
+                const pedidos = await respuesta.json();
+
+                if (!Array.isArray(pedidos)) {
+                    throw new Error(
+                        pedidos.error || "La respuesta no contiene pedidos."
+                    );
+                }
+
+                tabla.replaceChildren();
+
+                if (pedidos.length === 0) {
+                    const fila = document.createElement("tr");
+                    const celda = document.createElement("td");
+                    celda.colSpan = 4;
+                    celda.textContent = "Todavía no hay pedidos.";
+                    fila.appendChild(celda);
+                    tabla.appendChild(fila);
+                } else {
+                    pedidos.slice().reverse().forEach(pedido => {
+                        const fila = document.createElement("tr");
+
+                        [
+                            pedido.fecha || "",
+                            pedido.cliente || "",
+                            "$" + Number(pedido.total || 0).toFixed(2)
+                        ].forEach((valor, indice) => {
+                            const celda = document.createElement("td");
+                            celda.textContent = valor;
+                            if (indice === 2) celda.className = "total";
+                            fila.appendChild(celda);
+                        });
+
+                        const celdaDetalle = document.createElement("td");
+                        celdaDetalle.className = "detalle";
+                        celdaDetalle.textContent = pedido.detalle || "";
+                        fila.appendChild(celdaDetalle);
+
+                        tabla.appendChild(fila);
+                    });
+                }
+
+                estado.textContent =
+                    pedidos.length + " pedido(s) consultado(s) desde Google Sheets.";
+            } catch (error) {
+                tabla.replaceChildren();
+                const fila = document.createElement("tr");
+                const celda = document.createElement("td");
+                celda.colSpan = 4;
+                celda.textContent =
+                    "No se pudieron cargar los pedidos. " +
+                    error.message +
+                    " Si aparece un error de acceso, revisaremos la conexión entre GitHub Pages y Apps Script.";
+                fila.appendChild(celda);
+                tabla.appendChild(fila);
+                estado.textContent = "Error al consultar Google Sheets.";
+            } finally {
+                boton.disabled = false;
+            }
+        }
+
+        cargarPedidos();
     </script>
-
 </body>
-
 </html>
+
