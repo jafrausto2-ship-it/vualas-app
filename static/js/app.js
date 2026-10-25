@@ -187,7 +187,7 @@ function eliminarPedido(index){
 async function enviarAGoogleSheets(pedido){
 
     const url =
-    "PEGA_AQUI_LA_URL_DE_GOOGLE_APPS_SCRIPT";
+    "https://script.google.com/macros/s/AKfycbzKyj9vNQ1qSFShEF41Mzby11Rq02YY8IjP2oWmElGe7b1cdfjbFqtJZxRGyFTbetKXJQ/exec";
 
     try{
 
