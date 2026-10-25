@@ -16,19 +16,21 @@ const PRODUCTOS = [
 ];
 
 const URL_GOOGLE_SHEETS =
-    "https://script.google.com/macros/s/AKfycbzgajAV7KXScTqtH1PE7EQXbOqa29unuxdFQkhJ5WURUewTrpwGv6cwK4S4nt74FTzuKw/exec";
+    
+"https://script.google.com/macros/s/AKfycbzgajAV7KXScTqtH1PE7EQXbOqa29unuxdFQkhJ5WURUewTrpwGv6cwK4S4nt74FTzuKw/exec";
 
 
 // Guarda el pedido en el navegador y lo envía a Google Sheets
 async function guardarPedido(cliente, productos, total, detalle) {
     const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+
     const pedido = {
         id: Date.now(),
         cliente: cliente,
         fecha: new Date().toLocaleString("es-MX"),
         productos: productos,
         total: total,
-        detalle: detalle
+        detalle: detalle.trim()
     };
 
     pedidos.push(pedido);
@@ -60,14 +62,7 @@ async function crearPedido() {
 
     let total = 0;
     let hayProductos = false;
-
-    let detalle = `PEDIDO
-
-Cliente: ${cliente}
-
-PRODUCTOS
-
-`;
+    let detalle = "";
 
     const productosPedido = [];
 
@@ -86,6 +81,7 @@ PRODUCTOS
             const subtotal = cantidad * producto.precio;
             total += subtotal;
 
+            // Un producto por línea, sin cliente ni total dentro del detalle.
             detalle += `${cantidad} x ${producto.nombre} = $${subtotal}\n`;
 
             productosPedido.push({
@@ -100,8 +96,6 @@ PRODUCTOS
         alert("Selecciona al menos un producto.");
         return;
     }
-
-    detalle += `\nTOTAL: $${total}`;
 
     try {
         await guardarPedido(cliente, productosPedido, total, detalle);
