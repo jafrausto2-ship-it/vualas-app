@@ -1,10 +1,10 @@
-
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Administración de Pedidos</title>
+    <title>Administración de Pedidos Vualas</title>
 
     <style>
         body {
@@ -14,7 +14,9 @@
             color: #333;
         }
 
-        h1, h2 { color: #ff7b00; }
+        h1, h2 {
+            color: #ff7b00;
+        }
 
         .barra {
             display: flex;
@@ -40,11 +42,21 @@
             cursor: wait;
         }
 
-        .btn-eliminar { background: #c62828; }
-        .btn-cancelar { background: #666; }
-        .btn-guardar { background: #238636; }
+        .btn-eliminar {
+            background: #c62828;
+        }
 
-        #estado { color: #555; }
+        .btn-cancelar {
+            background: #666;
+        }
+
+        .btn-guardar {
+            background: #238636;
+        }
+
+        #estado {
+            color: #555;
+        }
 
         .panel {
             background: white;
@@ -52,6 +64,13 @@
             padding: 16px;
             margin: 20px 0;
             box-shadow: 0 1px 4px #ddd;
+        }
+
+        .total-general {
+            font-size: 34px;
+            font-weight: bold;
+            color: #ff7b00;
+            margin: 12px 0;
         }
 
         .tabla-contenedor {
@@ -97,7 +116,9 @@
             min-width: 145px;
         }
 
-        .acciones button { padding: 8px 10px; }
+        .acciones button {
+            padding: 8px 10px;
+        }
 
         .resumen {
             display: grid;
@@ -110,12 +131,14 @@
             border-radius: 8px;
             padding: 12px;
             background: #fffaf5;
+            overflow-wrap: anywhere;
         }
 
         .cantidad {
             font-size: 24px;
             font-weight: bold;
             color: #ff7b00;
+            margin-top: 6px;
         }
 
         label {
@@ -147,8 +170,17 @@
         }
 
         @media (max-width: 600px) {
-            body { margin: 12px; }
-            th, td { padding: 8px; }
+            body {
+                margin: 12px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+
+            .total-general {
+                font-size: 28px;
+            }
         }
     </style>
 </head>
@@ -163,29 +195,36 @@
         <span id="estado">Consultando Google Sheets...</span>
     </div>
 
+    <!-- TOTAL GENERAL -->
     <section class="panel">
-        <h2>📦 Resumen por producto</h2>
-    <div class="panel">
         <h2>🧾 Total general de pedidos</h2>
-        <p>
-            <strong id="totalGeneral">$0.00</strong>
-        </p>
+
+        <p id="totalGeneral" class="total-general">$0.00</p>
+
         <p>
             Pedidos registrados:
             <strong id="cantidadPedidos">0</strong>
         </p>
-    </div>        
+    </section>
 
+    <!-- RESUMEN POR PRODUCTO -->
+    <section class="panel">
+        <h2>📦 Resumen por producto</h2>
+        <p>Unidades solicitadas en todos los pedidos registrados.</p>
 
-<p>Unidades solicitadas en todos los pedidos registrados.</p>
         <div id="resumen" class="resumen">
             <p>Cargando resumen...</p>
         </div>
     </section>
 
+    <!-- FORMULARIO DE EDICIÓN -->
     <section id="panelEdicion" class="panel" hidden>
         <h2>✏️ Editar pedido</h2>
-        <p>Si cambias el detalle, usa el formato: cantidad x producto = $subtotal.</p>
+
+        <p>
+            Si cambias el detalle, usa el formato:
+            cantidad x producto = $subtotal.
+        </p>
 
         <form id="formEdicion">
             <input type="hidden" id="filaPedido">
@@ -197,19 +236,26 @@
             <input id="clientePedido" type="text" required>
 
             <label for="totalPedido">Total ($)</label>
-            <input id="totalPedido" type="number" min="0" step="0.01" required>
+            <input id="totalPedido" type="number"
+                   min="0" step="0.01" required>
 
             <label for="detallePedido">Detalle del pedido</label>
             <textarea id="detallePedido" rows="6" required></textarea>
 
             <div class="form-acciones">
-                <button type="submit" class="btn-guardar">Guardar cambios</button>
+                <button type="submit" class="btn-guardar">
+                    Guardar cambios
+                </button>
+
                 <button type="button" class="btn-cancelar"
-                        onclick="cancelarEdicion()">Cancelar</button>
+                        onclick="cancelarEdicion()">
+                    Cancelar
+                </button>
             </div>
         </form>
     </section>
 
+    <!-- TABLA DE PEDIDOS -->
     <div class="tabla-contenedor">
         <table>
             <thead>
@@ -221,8 +267,11 @@
                     <th>Acciones</th>
                 </tr>
             </thead>
+
             <tbody id="tablaPedidos">
-                <tr><td colspan="5">Cargando pedidos...</td></tr>
+                <tr>
+                    <td colspan="5">Cargando pedidos...</td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -239,15 +288,39 @@
         function crearCelda(texto, clase = "") {
             const celda = document.createElement("td");
             celda.textContent = texto;
-            if (clase) celda.className = clase;
+
+            if (clase) {
+                celda.className = clase;
+            }
+
             return celda;
         }
 
         function fechaLegible(fecha) {
             if (!fecha) return "";
-
-            // La fecha que devuelve Apps Script ya está formateada.
             return fecha;
+        }
+
+        function convertirNumero(valor) {
+            if (typeof valor === "number") {
+                return Number.isFinite(valor) ? valor : 0;
+            }
+
+            const numero = Number(
+                String(valor ?? "")
+                    .replace(/\$/g, "")
+                    .replace(/,/g, "")
+                    .trim()
+            );
+
+            return Number.isFinite(numero) ? numero : 0;
+        }
+
+        function formatoMoneda(valor) {
+            return convertirNumero(valor).toLocaleString("es-MX", {
+                style: "currency",
+                currency: "MXN"
+            });
         }
 
         async function cargarPedidos() {
@@ -260,7 +333,7 @@
 
             try {
                 const respuesta = await fetch(
-                    URL_GOOGLE_SHEETS + "?accion=pedidos"
+                    URL_GOOGLE_SHEETS + "?accion=pedidos&t=" + Date.now()
                 );
 
                 if (!respuesta.ok) {
@@ -276,27 +349,39 @@
                 }
 
                 pedidosActuales = pedidos;
+
+                // Actualizar total y resumen
+                generarResumen(pedidos);
+
+                // Actualizar tabla
                 tabla.replaceChildren();
 
                 if (pedidos.length === 0) {
-                    tabla.appendChild(crearFilaMensaje(
-                        "Todavía no hay pedidos."
-                    ));
+                    tabla.appendChild(
+                        crearFilaMensaje("Todavía no hay pedidos.")
+                    );
                 } else {
                     pedidos.slice().reverse().forEach(pedido => {
                         const fila = document.createElement("tr");
 
-                        fila.appendChild(crearCelda(
-                            fechaLegible(pedido.fecha)
-                        ));
-                        fila.appendChild(crearCelda(pedido.cliente || ""));
-                        fila.appendChild(crearCelda(
-                            "$" + Number(pedido.total || 0).toFixed(2),
-                            "total"
-                        ));
-                        fila.appendChild(crearCelda(
-                            pedido.detalle || "", "detalle"
-                        ));
+                        fila.appendChild(
+                            crearCelda(fechaLegible(pedido.fecha))
+                        );
+
+                        fila.appendChild(
+                            crearCelda(pedido.cliente || "")
+                        );
+
+                        fila.appendChild(
+                            crearCelda(
+                                formatoMoneda(pedido.total),
+                                "total"
+                            )
+                        );
+
+                        fila.appendChild(
+                            crearCelda(pedido.detalle || "", "detalle")
+                        );
 
                         const acciones = crearCelda();
                         acciones.className = "acciones";
@@ -316,17 +401,21 @@
                     });
                 }
 
-                generarResumen(pedidos);
-
                 estado.textContent =
                     pedidos.length + " pedido(s) consultado(s).";
 
             } catch (error) {
                 tabla.replaceChildren();
-                tabla.appendChild(crearFilaMensaje(
-                    "No se pudieron cargar los pedidos: " + error.message
-                ));
-                estado.textContent = "Error al consultar Google Sheets.";
+
+                tabla.appendChild(
+                    crearFilaMensaje(
+                        "No se pudieron cargar los pedidos: " + error.message
+                    )
+                );
+
+                estado.textContent =
+                    "Error al consultar Google Sheets: " + error.message;
+
             } finally {
                 boton.disabled = false;
             }
@@ -335,14 +424,29 @@
         function crearFilaMensaje(mensaje) {
             const fila = document.createElement("tr");
             const celda = crearCelda(mensaje);
+
             celda.colSpan = 5;
             fila.appendChild(celda);
+
             return fila;
         }
 
         function generarResumen(pedidos) {
             const cantidades = new Map();
 
+            // Sumar el importe de todos los pedidos
+            const totalGeneral = pedidos.reduce(
+                (suma, pedido) => suma + convertirNumero(pedido.total),
+                0
+            );
+
+            document.getElementById("totalGeneral").textContent =
+                formatoMoneda(totalGeneral);
+
+            document.getElementById("cantidadPedidos").textContent =
+                pedidos.length.toLocaleString("es-MX");
+
+            // Sumar unidades de cada producto
             pedidos.forEach(pedido => {
                 const detalle = pedido.detalle || "";
                 const lineas = detalle.split(/\r?\n/);
@@ -358,9 +462,12 @@
                     const cantidad = Number(
                         coincidencia[1].replace(",", ".")
                     );
+
                     const producto = coincidencia[2].trim();
 
-                    if (!producto || !Number.isFinite(cantidad)) return;
+                    if (!producto || !Number.isFinite(cantidad)) {
+                        return;
+                    }
 
                     cantidades.set(
                         producto,
@@ -369,27 +476,18 @@
                 });
             });
 
-            const totalGeneral = pedidos.reduce(
-                (suma, pedido) => suma + Number(pedido.total || 0),
-                0
-            );
-
-            document.getElementById("totalGeneral").textContent =
-                totalGeneral.toLocaleString("es-MX", {
-                    style: "currency",
-                    currency: "MXN"
-                });
-
-            document.getElementById("cantidadPedidos").textContent =
-                pedidos.length;
-
             const resumen = document.getElementById("resumen");
             resumen.replaceChildren();
 
             if (cantidades.size === 0) {
-                resumen.textContent =
-                    "No se encontraron cantidades en el formato esperado. " +
-                    "Los detalles deben incluir líneas como: 2 x Chetos Extreme = $30";
+                const mensaje = document.createElement("p");
+
+                mensaje.textContent = pedidos.length === 0
+                    ? "Todavía no hay productos registrados."
+                    : "No se encontraron cantidades. Revisa que el detalle " +
+                      "tenga líneas como: 2 x Chetos Extreme = $30";
+
+                resumen.appendChild(mensaje);
                 return;
             }
 
@@ -404,7 +502,8 @@
 
                     const numero = document.createElement("div");
                     numero.className = "cantidad";
-                    numero.textContent = cantidad.toLocaleString("es-MX");
+                    numero.textContent =
+                        cantidad.toLocaleString("es-MX");
 
                     const etiqueta = document.createElement("div");
                     etiqueta.textContent = "unidades";
@@ -416,17 +515,25 @@
 
         function iniciarEdicion(pedido) {
             if (!pedido.fila) {
-                alert("Este pedido no tiene número de fila. Actualiza la implementación de Apps Script.");
+                alert(
+                    "Este pedido no tiene número de fila. " +
+                    "Revisa la implementación de Apps Script."
+                );
                 return;
             }
 
             document.getElementById("filaPedido").value = pedido.fila;
-            document.getElementById("fechaPedido").value = pedido.fecha || "";
-            document.getElementById("clientePedido").value = pedido.cliente || "";
-            document.getElementById("totalPedido").value = Number(pedido.total || 0);
-            document.getElementById("detallePedido").value = pedido.detalle || "";
+            document.getElementById("fechaPedido").value =
+                pedido.fecha || "";
+            document.getElementById("clientePedido").value =
+                pedido.cliente || "";
+            document.getElementById("totalPedido").value =
+                convertirNumero(pedido.total);
+            document.getElementById("detallePedido").value =
+                pedido.detalle || "";
 
             document.getElementById("panelEdicion").hidden = false;
+
             document.getElementById("panelEdicion").scrollIntoView({
                 behavior: "smooth"
             });
@@ -438,7 +545,6 @@
         }
 
         async function enviarAccion(datos) {
-            // Apps Script acepta payload como parámetro de formulario.
             const cuerpo = new URLSearchParams();
             cuerpo.set("payload", JSON.stringify(datos));
 
@@ -448,12 +554,12 @@
                 body: cuerpo
             });
 
-            // En modo no-cors el navegador no permite leer la respuesta.
-            // Se vuelve a consultar la hoja para comprobar el resultado.
+            // Se consulta nuevamente la hoja para verificar los cambios.
         }
 
         document.getElementById("formEdicion").addEventListener(
-            "submit", async function(event) {
+            "submit",
+            async function(event) {
                 event.preventDefault();
 
                 const boton = this.querySelector('[type="submit"]');
@@ -462,21 +568,36 @@
                 try {
                     await enviarAccion({
                         accion: "editar",
-                        fila: Number(document.getElementById("filaPedido").value),
+                        fila: Number(
+                            document.getElementById("filaPedido").value
+                        ),
                         fecha: document.getElementById("fechaPedido").value,
-                        cliente: document.getElementById("clientePedido").value.trim(),
-                        total: Number(document.getElementById("totalPedido").value),
-                        detalle: document.getElementById("detallePedido").value
+                        cliente: document.getElementById(
+                            "clientePedido"
+                        ).value.trim(),
+                        total: Number(
+                            document.getElementById("totalPedido").value
+                        ),
+                        detalle: document.getElementById(
+                            "detallePedido"
+                        ).value
                     });
 
                     cancelarEdicion();
+
                     document.getElementById("estado").textContent =
                         "Solicitud enviada. Verificando cambios...";
-                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    await new Promise(resolve =>
+                        setTimeout(resolve, 1500)
+                    );
+
                     await cargarPedidos();
 
                 } catch (error) {
-                    alert("No se pudo enviar la solicitud: " + error.message);
+                    alert(
+                        "No se pudo enviar la solicitud: " + error.message
+                    );
                 } finally {
                     boton.disabled = false;
                 }
@@ -505,16 +626,23 @@
 
                 document.getElementById("estado").textContent =
                     "Solicitud enviada. Verificando eliminación...";
-                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                await new Promise(resolve =>
+                    setTimeout(resolve, 1500)
+                );
+
                 await cargarPedidos();
 
             } catch (error) {
-                alert("No se pudo enviar la solicitud: " + error.message);
+                alert(
+                    "No se pudo enviar la solicitud: " + error.message
+                );
             }
         }
 
+        // Cargar pedidos al abrir la página
         cargarPedidos();
     </script>
 </body>
 </html>
-
+```
