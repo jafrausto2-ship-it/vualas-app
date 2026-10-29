@@ -1,190 +1,664 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vualas - Pedidos</title>
+
+    <title>Vualas | Haz tu pedido</title>
 
     <style>
+        :root {
+            --naranja: #f47721;
+            --naranja-oscuro: #dc5d0b;
+            --fondo: #fff8f2;
+            --texto: #332820;
+            --gris: #766d66;
+            --borde: #f0e5dc;
+            --blanco: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Segoe UI, Arial, sans-serif;
-            background: #f5f5f5;
             margin: 0;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont,
+                "Segoe UI", Arial, sans-serif;
+            background: var(--fondo);
+            color: var(--texto);
+        }
+
+        .encabezado {
+            background: linear-gradient(135deg, #fff0df, #ffffff);
+            padding: 35px 20px 28px;
+            text-align: center;
+            border-bottom: 1px solid var(--borde);
+        }
+
+        .marca {
+            display: inline-block;
+            color: var(--naranja);
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
         }
 
         h1 {
-            text-align: center;
-            color: #ff7b00;
+            margin: 0;
+            font-size: clamp(30px, 5vw, 44px);
+            line-height: 1.15;
+            letter-spacing: -1px;
+        }
+
+        .subtitulo {
+            color: var(--gris);
+            margin: 12px auto 0;
+            max-width: 460px;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .contenedor {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 24px 18px 150px;
         }
 
         .cliente {
-            max-width: 500px;
-            margin: 20px auto;
-            text-align: center;
+            background: var(--blanco);
+            padding: 22px;
+            border-radius: 18px;
+            border: 1px solid var(--borde);
+            box-shadow: 0 5px 20px rgba(80, 45, 20, 0.04);
+            margin-bottom: 30px;
+        }
+
+        .cliente label {
+            display: block;
+            font-weight: 750;
+            margin-bottom: 10px;
         }
 
         .cliente input {
             width: 100%;
-            padding: 10px;
+            min-height: 48px;
+            padding: 12px 14px;
+            border: 1px solid #ded3ca;
+            border-radius: 10px;
+            font: inherit;
             font-size: 16px;
+            background: #fffdfa;
+            color: var(--texto);
+        }
+
+        input:focus {
+            outline: 2px solid #ffc18f;
+            border-color: var(--naranja);
+        }
+
+        .titulo-productos {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 0 0 18px;
+        }
+
+        .titulo-productos h2 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .titulo-productos p {
+            color: var(--gris);
+            font-size: 13px;
+            margin: 0;
         }
 
         .productos {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
-            max-width: 1200px;
-            margin: auto;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
         }
 
         .card {
-            background: white;
-            border-radius: 15px;
-            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 0;
+            background: var(--blanco);
+            border: 1px solid var(--borde);
+            border-radius: 18px;
+            padding: 16px;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, .10);
+            box-shadow: 0 4px 14px rgba(80, 45, 20, 0.04);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 9px 24px rgba(80, 45, 20, 0.09);
+        }
+
+        .imagen-producto {
+            width: 100%;
+            height: 155px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fffaf5;
+            border-radius: 13px;
+            overflow: hidden;
         }
 
         .card img {
-            width: 180px;
-            height: 180px;
-            object-fit: cover;
-            border-radius: 10px;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 8px;
+        }
+
+        .card h3 {
+            font-size: 15px;
+            line-height: 1.4;
+            min-height: 42px;
+            margin: 13px 0 5px;
         }
 
         .precio {
-            font-weight: bold;
-            color: #ff7b00;
-            margin: 10px 0;
+            color: var(--naranja-oscuro);
+            font-size: 22px;
+            font-weight: 800;
+            margin: 3px 0 15px;
+        }
+
+        .precio small {
+            font-size: 12px;
+            color: var(--gris);
+            font-weight: 500;
+        }
+
+        .control-cantidad {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .boton-cantidad {
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--borde);
+            background: #fff7f0;
+            color: var(--naranja-oscuro);
+            border-radius: 10px;
+            font-size: 22px;
+            font-weight: 700;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        .boton-cantidad:hover {
+            background: #ffe6d2;
         }
 
         .cantidad {
-            width: 80px;
-            padding: 8px;
+            width: 52px;
+            height: 38px;
+            padding: 5px;
             text-align: center;
+            border: 1px solid #ded3ca;
+            border-radius: 9px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--texto);
+        }
+
+        .resumen-fijo {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.97);
+            border-top: 1px solid var(--borde);
+            box-shadow: 0 -5px 22px rgba(50, 30, 15, 0.08);
+            padding: 14px 18px;
+            padding-bottom: calc(14px + env(safe-area-inset-bottom));
+        }
+
+        .resumen-interior {
+            max-width: 1120px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .total-etiqueta {
+            color: var(--gris);
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .total {
+            color: var(--naranja-oscuro);
+            font-size: 25px;
+            font-weight: 850;
         }
 
         .acciones {
-            text-align: center;
-            margin-top: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        button {
-            background: #ff7b00;
+        .boton-pedido {
+            background: var(--naranja);
             color: white;
             border: none;
+            min-height: 48px;
             padding: 12px 24px;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 15px;
+            font-weight: 750;
+            box-shadow: 0 4px 12px rgba(244, 119, 33, 0.25);
         }
 
-        button:hover {
-            background: #e06600;
+        .boton-pedido:hover {
+            background: var(--naranja-oscuro);
         }
 
-        .admin {
-            margin-left: 15px;
-            text-decoration: none;
-            color: #333;
-            font-weight: bold;
+        .boton-pedido:focus-visible,
+        .boton-cantidad:focus-visible {
+            outline: 3px solid #ffbd8a;
+            outline-offset: 3px;
+        }
+
+        .nota {
+            max-width: 1120px;
+            margin: 24px auto 0;
+            text-align: center;
+            color: var(--gris);
+            font-size: 12px;
+        }
+
+        @media (max-width: 900px) {
+            .productos {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .imagen-producto {
+                height: 145px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .encabezado {
+                padding: 28px 16px 23px;
+            }
+
+            .contenedor {
+                padding: 20px 12px 135px;
+            }
+
+            .cliente {
+                padding: 17px;
+                margin-bottom: 25px;
+            }
+
+            .titulo-productos {
+                align-items: start;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .titulo-productos h2 {
+                font-size: 22px;
+            }
+
+            .productos {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 11px;
+            }
+
+            .card {
+                padding: 10px;
+                border-radius: 14px;
+            }
+
+            .imagen-producto {
+                height: 125px;
+            }
+
+            .card h3 {
+                font-size: 13px;
+                min-height: 38px;
+                margin-top: 10px;
+            }
+
+            .precio {
+                font-size: 20px;
+                margin-bottom: 12px;
+            }
+
+            .boton-cantidad {
+                width: 34px;
+                height: 36px;
+            }
+
+            .cantidad {
+                width: 40px;
+                height: 36px;
+            }
+
+            .control-cantidad {
+                gap: 6px;
+            }
+
+            .resumen-interior {
+                gap: 10px;
+            }
+
+            .total {
+                font-size: 22px;
+            }
+
+            .boton-pedido {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <h1>🧁 Pedidos Vualas</h1>
+    <header class="encabezado">
+        <div class="marca">Vualas</div>
+        <h1>¡Arma tu pedido! 🧁</h1>
+        <p class="subtitulo">
+            Elige tus productos favoritos, indica las cantidades
+            y revisa el total antes de confirmar.
+        </p>
+    </header>
 
-    <div class="cliente">
-        <input
-            type="text"
-            id="cliente"
-            placeholder="Nombre del cliente">
+    <main class="contenedor">
+
+        <section class="cliente">
+            <label for="cliente">¿A nombre de quién va el pedido?</label>
+            <input
+                type="text"
+                id="cliente"
+                placeholder="Escribe el nombre del cliente"
+                autocomplete="name"
+                maxlength="100"
+                required>
+        </section>
+
+        <div class="titulo-productos">
+            <h2> nuestros productos</h2>
+            <p>Selecciona la cantidad que necesitas</p>
+        </div>
+
+        <section class="productos" aria-label="Catálogo de productos">
+
+            <article class="card">
+                <div class="imagen-producto">
+                    <img src="static/Imagenes/Cajeta.jpg" alt="Vualá sabor cajeta">
+                </div>
+                <h3>Vualá Cajeta Individual</h3>
+                <div class="precio">$17 <small>c/u</small></div>
+                <div class="control-cantidad">
+                    <button class="boton-cantidad" type="button" data-target="cajeta_ind" data-delta="-1" 
+aria-label="Quitar cajeta individual">−</button>
+                    <input class="cantidad" type="number" id="cajeta_ind" min="0" step="1" value="0" 
+aria-label="Cantidad cajeta individual">
+                    <button class="boton-cantidad" type="button" data-target="cajeta_ind" data-delta="1" 
+aria-label="Agregar cajeta individual">+</button>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="imagen-producto">
+                    <img src="static/Imagenes/Cajeta.jpg" alt="Vualá cajeta en tira">
+                </div>
+                <h3>Vualá Cajeta Tira</h3>
+                <div class="precio">$100 <small>por tira</small></div>
+                <div class="control-cantidad">
+                    <button class="boton-cantidad" type="button" data-target="cajeta_tira" data-delta="-1" 
+aria-label="Quitar tira de cajeta">−</button>
+                    <input class="cantidad" type="number" id="cajeta_tira" min="0" step="1" value="0" 
+aria-label="Cantidad de tiras de cajeta">
+                    <button class="boton-cantidad" type="button" data-target="cajeta_tira" data-delta="1" 
+aria-label="Agregar tira de cajeta">+</button>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="imagen-producto">
+                    <img src="static/Imagenes/Vainilla.jpg" alt="Vualá sabor vainilla">
+                </div>
+                <h3>Vualá Vainilla Individual</h3>
+                <div class="precio">$17 <small>c/u</small></div>
+                <div class="control-cantidad">
+                    <button class="boton-cantidad" type="button" data-target="vainilla_ind" data-delta="-1" 
+aria-label="Quitar vainilla individual">−</button>
+                    <input class="cantidad" type="number" id="vainilla_ind" min="0" step="1" value="0" 
+aria-label="Cantidad vainilla individual">
+                    <button class="boton-cantidad" type="button" data-target="vainilla_ind" data-delta="1" 
+aria-label="Agregar vainilla individual">+</button>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="imagen-producto">
+                    <img src="static/Imagenes/Vainilla.jpg" alt="Vualá vainilla en tira">
+                </div>
+                <h3>Vualá Vainilla Tira</h3>
+                <div class="precio">$100 <small>por tira</small></div>
+                <div class="control-cantidad">
+                    <button class="boton-cantidad" type="button" data-target="vainilla_tira" data-delta="-1" 
+aria-label="Quitar tira de vainilla">−</button>
+                    <input class="cantidad" type="number" id="vainilla_tira" min="0" step="1" value="0" 
+aria-label="Cantidad de tiras de vainilla">
+                    <button class="boton-cantidad" type="button" data-target="vainilla_tira" data-delta="1" 
+aria-label="Agregar tira de vainilla">+</button>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="imagen-producto">
+                    <img src="static/Imagenes/Chocolate.jpg" alt="Vualá sabor chocolate">
+                </div>
+                <h3>Vualá Chocolate Individual</h3>
+                <div class="precio">$17 <small>c/u</small></div>
+                <div class="control-cantidad">
+                    <button class="boton-cantidad" type="button" data-target="chocolate_ind" data-delta="-1" 
+aria-label="Quitar chocolate individual">−</button>
+                    <input class="cantidad" type="number" id="chocolate_ind" min="0" step="1" value="0" 
+aria-label="Cantidad chocolate individual">
+                    <button class="boton-cantidad" type="button" data-target="chocolate_ind" data-delta="1" 
+aria-label="Agregar chocolate individual">+</button>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="imagen-producto">
+                    <img src="static/Imagenes/Chocolate.jpg" alt="Vualá chocolate en tira">
+                </div>
+                <h3>Vualá Chocolate Tira</h3>
+                <div class="precio">$100 <small>por tira</small></div>
+                <div class="control-cantidad">
+                    <button class="boton-cantidad" type="button" data-target="chocolate_tira" data-delta="-1" 
+aria-label="Quitar tira de chocolate">−</button>
+                    <input class="cantidad" type="number" id="chocolate_tira" min="0" step="1" value="0" 
+aria-label="Cantidad de tiras de chocolate">
+                    <button class="boton-cantidad" type="button" data-target="chocolate_tira" data-delta="1" 
+aria-label="Agregar tira de chocolate">+</button>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="imagen-producto">
+                    <img src="static/Imagenes/Prispas.jpg" alt="Prispas">
+                </div>
+                <h3>Prispas</h3>
+                <div class="precio">$5 <small>c/u</small></div>
+                <div class="control-cantidad">
+                    <button class="boton-cantidad" type="button" data-target="prispas" data-delta="-1" 
+aria-label="Quitar Prispas">−</button>
+                    <input class="cantidad" type="number" id="prispas" min="0" step="1" value="0" 
+aria-label="Cantidad de Prispas">
+                    <button class="boton-cantidad" type="button" data-target="prispas" data-delta="1" 
+aria-label="Agregar Prispas">+</button>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="imagen-producto">
+                    <img src="static/Imagenes/Chetos-Extreme.jpg" alt="Chetos Extreme">
+                </div>
+                <h3>Chetos Extreme</h3>
+                <div class="precio">$15 <small>c/u</small></div>
+                <div class="control-cantidad">
+                    <button class="boton-cantidad" type="button" data-target="extreme" data-delta="-1" 
+aria-label="Quitar Chetos Extreme">−</button>
+                    <input class="cantidad" type="number" id="extreme" min="0" step="1" value="0" 
+aria-label="Cantidad Chetos Extreme">
+                    <button class="boton-cantidad" type="button" data-target="extreme" data-delta="1" 
+aria-label="Agregar Chetos Extreme">+</button>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="imagen-producto">
+                    <img src="static/Imagenes/Chetos-Spicante.jpg" alt="Chetos Spicante">
+                </div>
+                <h3>Chetos Spicante</h3>
+                <div class="precio">$22 <small>c/u</small></div>
+                <div class="control-cantidad">
+                    <button class="boton-cantidad" type="button" data-target="spicante" data-delta="-1" 
+aria-label="Quitar Chetos Spicante">−</button>
+                    <input class="cantidad" type="number" id="spicante" min="0" step="1" value="0" 
+aria-label="Cantidad Chetos Spicante">
+                    <button class="boton-cantidad" type="button" data-target="spicante" data-delta="1" 
+aria-label="Agregar Chetos Spicante">+</button>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="imagen-producto">
+                    <img src="static/Imagenes/Chetos-Queso.jpg" alt="Chetos Queso">
+                </div>
+                <h3>Chetos Queso</h3>
+                <div class="precio">$17 <small>c/u</small></div>
+                <div class="control-cantidad">
+                    <button class="boton-cantidad" type="button" data-target="queso" data-delta="-1" 
+aria-label="Quitar Chetos Queso">−</button>
+                    <input class="cantidad" type="number" id="queso" min="0" step="1" value="0" 
+aria-label="Cantidad Chetos Queso">
+                    <button class="boton-cantidad" type="button" data-target="queso" data-delta="1" 
+aria-label="Agregar Chetos Queso">+</button>
+                </div>
+            </article>
+
+        </section>
+
+        <p class="nota">
+            Revisa las cantidades y el total antes de realizar tu pedido.
+        </p>
+    </main>
+
+    <div class="resumen-fijo">
+        <div class="resumen-interior">
+            <div>
+                <div class="total-etiqueta">Total de tu pedido</div>
+                <div class="total" id="totalPedido">$0.00</div>
+            </div>
+
+            <div class="acciones">
+                <button class="boton-pedido" type="button" onclick="crearPedido()">
+                    Realizar pedido →
+                </button>
+            </div>
+        </div>
     </div>
 
-    <div class="productos">
+    <script>
+        const precios = {
+            cajeta_ind: 17,
+            cajeta_tira: 100,
+            vainilla_ind: 17,
+            vainilla_tira: 100,
+            chocolate_ind: 17,
+            chocolate_tira: 100,
+            prispas: 5,
+            extreme: 15,
+            spicante: 22,
+            queso: 17
+        };
 
-        <div class="card">
-            <img src="static/Imagenes/Cajeta.jpg" alt="">
-            <h3>Vualá Cajeta Individual</h3>
-            <div class="precio">$17</div>
-            <input class="cantidad" type="number" id="cajeta_ind" min="0" value="0">
-        </div>
+        function actualizarTotal() {
+            let total = 0;
 
-        <div class="card">
-            <img src="static/Imagenes/Cajeta.jpg" alt="">
-            <h3>Vualá Cajeta Tira</h3>
-            <div class="precio">$100</div>
-            <input class="cantidad" type="number" id="cajeta_tira" min="0" value="0">
-        </div>
+            document.querySelectorAll(".cantidad").forEach(input => {
+                let cantidad = Math.max(
+                    0,
+                    Math.floor(Number(input.value) || 0)
+                );
 
-        <div class="card">
-            <img src="static/Imagenes/Vainilla.jpg" alt="">
-            <h3>Vualá Vainilla Individual</h3>
-            <div class="precio">$17</div>
-            <input class="cantidad" type="number" id="vainilla_ind" min="0" value="0">
-        </div>
+                if (input.value !== "" && Number(input.value) < 0) {
+                    cantidad = 0;
+                    input.value = 0;
+                }
 
-        <div class="card">
-            <img src="static/Imagenes/Vainilla.jpg" alt="">
-            <h3>Vualá Vainilla Tira</h3>
-            <div class="precio">$100</div>
-            <input class="cantidad" type="number" id="vainilla_tira" min="0" value="0">
-        </div>
+                total += cantidad * precios[input.id];
+            });
 
-        <div class="card">
-            <img src="static/Imagenes/Chocolate.jpg" alt="">
-            <h3>Vualá Chocolate Individual</h3>
-            <div class="precio">$17</div>
-            <input class="cantidad" type="number" id="chocolate_ind" min="0" value="0">
-        </div>
+            document.getElementById("totalPedido").textContent =
+                total.toLocaleString("es-MX", {
+                    style: "currency",
+                    currency: "MXN"
+                });
+        }
 
-        <div class="card">
-            <img src="static/Imagenes/Chocolate.jpg" alt="">
-            <h3>Vualá Chocolate Tira</h3>
-            <div class="precio">$100</div>
-            <input class="cantidad" type="number" id="chocolate_tira" min="0" value="0">
-        </div>
+        document.querySelectorAll(".cantidad").forEach(input => {
+            input.addEventListener("input", actualizarTotal);
 
-        <div class="card">
-            <img src="static/Imagenes/Prispas.jpg" alt="">
-            <h3>Prispas</h3>
-            <div class="precio">$5</div>
-            <input class="cantidad" type="number" id="prispas" min="0" value="0">
-        </div>
+            input.addEventListener("change", () => {
+                input.value = Math.max(
+                    0,
+                    Math.floor(Number(input.value) || 0)
+                );
+                actualizarTotal();
+            });
+        });
 
-        <div class="card">
-            <img src="static/Imagenes/Chetos-Extreme.jpg" alt="">
-            <h3>Chetos Extreme</h3>
-            <div class="precio">$15</div>
-            <input class="cantidad" type="number" id="extreme" min="0" value="0">
-        </div>
+        document.querySelectorAll(".boton-cantidad").forEach(boton => {
+            boton.addEventListener("click", () => {
+                const input = document.getElementById(boton.dataset.target);
+                const cambio = Number(boton.dataset.delta);
 
-        <div class="card">
-            <img src="static/Imagenes/Chetos-Spicante.jpg" alt="">
-            <h3>Chetos Spicante</h3>
-            <div class="precio">$22</div>
-            <input class="cantidad" type="number" id="spicante" min="0" value="0">
-        </div>
+                input.value = Math.max(
+                    0,
+                    Math.floor(Number(input.value) || 0) + cambio
+                );
 
-        <div class="card">
-            <img src="static/Imagenes/Chetos-Queso.jpg" alt="">
-            <h3>Chetos Queso</h3>
-            <div class="precio">$17</div>
-            <input class="cantidad" type="number" id="queso" min="0" value="0">
-        </div>
+                actualizarTotal();
+            });
+        });
 
-    </div>
-
-    <div class="acciones">
-
-        <button onclick="crearPedido()">
-            Realizar Pedido
-        </button>
-
-    </div>
+        actualizarTotal();
+    </script>
 
     <script src="static/js/app.js?v=3"></script>
+
+</body>
+</html>
