@@ -3,325 +3,853 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Administración de Pedidos Vualas</title>
+<title>Vualas | Administración de pedidos</title>
 
 <style>
+:root {
+    --naranja: #f47b20;
+    --naranja-claro: #fff0e3;
+    --fondo: #f5f6fa;
+    --texto: #252b3b;
+    --gris: #788092;
+    --borde: #e9ebf1;
+    --sidebar: #202536;
+    --verde: #16845b;
+    --rojo: #cf3f48;
+}
+
 * {
     box-sizing: border-box;
 }
 
 body {
-    font-family: "Segoe UI", Arial, sans-serif;
-    margin: 20px;
-    background: #f5f5f5;
-    color: #333;
-    line-height: 1.45;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 Arial, sans-serif;
+    color: var(--texto);
+    background: var(--fondo);
 }
 
-h1, h2 {
-    color: #ff7b00;
+button, input, textarea {
+    font: inherit;
 }
 
-h1 {
-    margin-bottom: 18px;
-}
-
-.barra {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    align-items: center;
-    margin-bottom: 16px;
-}
-
-button, .volver {
-    padding: 10px 15px;
-    border: 0;
-    border-radius: 8px;
-    background: #ff7b00;
-    color: white;
+button {
     cursor: pointer;
-    text-decoration: none;
-    font-size: 14px;
-    display: inline-block;
-}
-
-button:hover, .volver:hover {
-    filter: brightness(.94);
 }
 
 button:disabled {
-    opacity: .6;
+    opacity: .55;
     cursor: wait;
 }
 
-.btn-eliminar {
-    background: #c62828;
+.app {
+    display: flex;
+    min-height: 100vh;
 }
 
-.btn-cancelar {
-    background: #666;
-}
+/* BARRA LATERAL */
 
-.btn-guardar {
-    background: #238636;
-}
-
-#estado {
-    color: #555;
-}
-
-.panel {
-    background: white;
-    border-radius: 10px;
-    padding: 18px;
-    margin: 20px 0;
-    box-shadow: 0 1px 4px #ddd;
-}
-
-.total-general {
-    font-size: 34px;
-    font-weight: bold;
-    color: #ff7b00;
-    margin: 12px 0;
-}
-
-.tabla-contenedor {
-    overflow-x: auto;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 1px 4px #ddd;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    min-width: 760px;
-}
-
-th {
-    background: #ff7b00;
+.sidebar {
+    width: 245px;
+    flex-shrink: 0;
+    background: var(--sidebar);
     color: white;
-    padding: 13px;
-    text-align: left;
-    white-space: nowrap;
+    padding: 28px 18px;
+    display: flex;
+    flex-direction: column;
 }
 
-td {
-    border-bottom: 1px solid #eee;
-    padding: 12px;
-    vertical-align: top;
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 10px 32px;
 }
 
-tbody tr:nth-child(even) {
-    background: #fffaf5;
+.brand-icon {
+    width: 43px;
+    height: 43px;
+    display: grid;
+    place-items: center;
+    background: var(--naranja);
+    border-radius: 13px;
+    font-size: 24px;
 }
 
-tbody tr:hover {
-    background: #fff0df;
+.brand-name {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: .5px;
 }
 
-.total {
-    text-align: right;
-    white-space: nowrap;
-    font-weight: bold;
-    color: #333;
+.brand-subtitle {
+    color: #b9bdcb;
+    font-size: 12px;
+    margin-top: 3px;
 }
 
-.detalle {
-    white-space: pre-wrap;
-    min-width: 220px;
+.menu-label {
+    color: #969caf;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    padding: 0 12px;
+    margin-bottom: 12px;
+}
+
+.menu-item {
+    display: block;
+    padding: 13px 14px;
+    border-radius: 10px;
+    color: #d8dbea;
+    text-decoration: none;
+    margin-bottom: 7px;
+    font-size: 14px;
+}
+
+.menu-item.active {
+    color: white;
+    background: #353b4f;
+    border-left: 3px solid var(--naranja);
+}
+
+.menu-item:hover {
+    background: #30364a;
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+    border-top: 1px solid #3b4052;
+    padding: 20px 10px 0;
+    color: #aeb4c5;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+/* CONTENIDO PRINCIPAL */
+
+.main {
+    flex: 1;
+    min-width: 0;
+    padding: 32px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 30px;
+}
+
+.eyebrow {
+    color: var(--gris);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.3px;
+    font-weight: 700;
+    margin-bottom: 7px;
+}
+
+h1 {
+    margin: 0;
+    font-size: 29px;
+    letter-spacing: -.8px;
+}
+
+.subtitle {
+    color: var(--gris);
+    font-size: 14px;
+    margin: 8px 0 0;
+}
+
+.btn {
+    border: 0;
+    border-radius: 9px;
+    padding: 11px 16px;
+    font-weight: 600;
+    font-size: 13px;
+    transition: .15s;
+}
+
+.btn:hover {
+    filter: brightness(.96);
+}
+
+.btn-primary {
+    background: var(--naranja);
+    color: white;
+    box-shadow: 0 4px 10px #f47b2025;
+}
+
+.btn-secondary {
+    background: #eef0f5;
+    color: #434b5e;
+}
+
+.btn-danger {
+    background: #fff0f0;
+    color: var(--rojo);
+}
+
+.btn-success {
+    background: var(--verde);
+    color: white;
+}
+
+.btn-small {
+    padding: 8px 10px;
+    font-size: 12px;
+}
+
+/* TARJETAS DE RESUMEN */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: white;
+    border: 1px solid var(--borde);
+    border-radius: 15px;
+    padding: 22px;
+    min-width: 0;
+    box-shadow: 0 3px 12px #20253606;
+}
+
+.stat-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.stat-label {
+    color: var(--gris);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 20px;
+    background: var(--naranja-claro);
+}
+
+.stat-value {
+    font-size: clamp(23px, 2.5vw, 32px);
+    font-weight: 800;
+    margin-top: 18px;
+    letter-spacing: -1px;
     overflow-wrap: anywhere;
 }
 
-.acciones {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    min-width: 145px;
+.stat-foot {
+    font-size: 12px;
+    color: var(--gris);
+    margin-top: 7px;
 }
 
-.acciones button {
-    padding: 8px 10px;
+/* PANELES */
+
+.panel {
+    background: white;
+    border: 1px solid var(--borde);
+    border-radius: 15px;
+    margin-bottom: 24px;
+    box-shadow: 0 3px 12px #20253606;
+    overflow: hidden;
 }
+
+.panel-header {
+    padding: 22px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    border-bottom: 1px solid var(--borde);
+}
+
+.panel-title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 750;
+}
+
+.panel-description {
+    color: var(--gris);
+    font-size: 12px;
+    margin: 6px 0 0;
+}
+
+.panel-body {
+    padding: 22px 24px;
+}
+
+/* RESUMEN DE PRODUCTOS */
 
 .resumen {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
     gap: 12px;
 }
 
 .producto {
-    border: 1px solid #eee;
-    border-radius: 8px;
-    padding: 12px;
-    background: #fffaf5;
+    background: #fafbfe;
+    border: 1px solid var(--borde);
+    padding: 15px;
+    border-radius: 12px;
+    min-width: 0;
+}
+
+.producto-nombre {
+    font-size: 13px;
+    font-weight: 650;
     overflow-wrap: anywhere;
 }
 
 .cantidad {
-    font-size: 24px;
-    font-weight: bold;
-    color: #ff7b00;
-    margin-top: 6px;
+    color: var(--naranja);
+    font-size: 27px;
+    font-weight: 800;
+    margin-top: 9px;
+}
+
+.producto-unidad {
+    font-size: 11px;
+    color: var(--gris);
+}
+
+/* BUSCADOR Y TABLA */
+
+.table-tools {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--borde);
+}
+
+.search-box {
+    flex: 1;
+    min-width: 210px;
+    position: relative;
+}
+
+.search-box input {
+    width: 100%;
+    border: 1px solid #dfe2ea;
+    border-radius: 9px;
+    padding: 11px 13px;
+    outline: none;
+    background: #fafbfe;
+    font-size: 13px;
+}
+
+.search-box input:focus {
+    border-color: var(--naranja);
+    box-shadow: 0 0 0 3px #f47b2015;
+}
+
+.result-count {
+    font-size: 12px;
+    color: var(--gris);
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 790px;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #f8f9fc;
+}
+
+th {
+    padding: 14px 17px;
+    text-align: left;
+    color: #777f91;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    white-space: nowrap;
+}
+
+td {
+    padding: 17px;
+    border-top: 1px solid #eff0f4;
+    font-size: 13px;
+    vertical-align: top;
+}
+
+tbody tr:hover {
+    background: #fffaf6;
+}
+
+.cliente-nombre {
+    font-weight: 700;
+    color: #2b3040;
+}
+
+.fecha {
+    white-space: nowrap;
+    color: #626b7c;
+    font-size: 12px;
+}
+
+.total {
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.detalle {
+    min-width: 230px;
+    max-width: 360px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    color: #626b7c;
+    line-height: 1.7;
+    font-size: 12px;
+}
+
+.acciones {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    min-width: 130px;
+}
+
+.table-message {
+    padding: 30px !important;
+    text-align: center;
+    color: var(--gris);
+}
+
+/* FORMULARIO DE EDICIÓN */
+
+#panelEdicion {
+    border-top: 4px solid var(--naranja);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+}
+
+.campo {
+    min-width: 0;
+}
+
+.campo-completo {
+    grid-column: 1 / -1;
 }
 
 label {
     display: block;
-    margin-top: 12px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 7px;
+    color: #555d70;
 }
 
 input, textarea {
-    box-sizing: border-box;
     width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font: inherit;
+    border: 1px solid #dfe2ea;
+    border-radius: 9px;
+    padding: 11px 12px;
+    outline: none;
+    color: var(--texto);
+    background: white;
 }
 
-.form-acciones {
+input:focus, textarea:focus {
+    border-color: var(--naranja);
+    box-shadow: 0 0 0 3px #f47b2015;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.form-actions {
     display: flex;
-    gap: 8px;
-    margin-top: 15px;
+    gap: 9px;
     flex-wrap: wrap;
+    margin-top: 18px;
 }
 
-.volver {
-    margin-top: 20px;
+/* ESTADO */
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--gris);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #b7bdc9;
+    flex-shrink: 0;
+}
+
+.status-dot.ok {
+    background: #1b9b69;
+}
+
+.status-dot.error {
+    background: var(--rojo);
+}
+
+.footer {
+    text-align: center;
+    color: #9298a7;
+    font-size: 11px;
+    padding: 10px 0 20px;
 }
 
 [hidden] {
     display: none !important;
 }
 
-@media (max-width: 600px) {
-    body {
-        margin: 12px;
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+    .sidebar {
+        width: 200px;
     }
 
-    .panel {
-        padding: 13px;
+    .main {
+        padding: 23px;
     }
 
-    th, td {
-        padding: 9px;
+    .stats {
+        gap: 12px;
     }
 
-    .total-general {
+    .stat-card {
+        padding: 17px;
+    }
+}
+
+@media (max-width: 720px) {
+    .app {
+        display: block;
+    }
+
+    .sidebar {
+        width: 100%;
+        padding: 15px 16px;
+    }
+
+    .brand {
+        padding: 0 3px 14px;
+    }
+
+    .brand-icon {
+        width: 37px;
+        height: 37px;
+    }
+
+    .menu-label, .sidebar-bottom {
+        display: none;
+    }
+
+    .menu-item {
+        display: inline-block;
+        margin: 0 5px 0 0;
+        padding: 10px 12px;
+    }
+
+    .main {
+        padding: 20px 14px;
+    }
+
+    .topbar {
+        align-items: flex-start;
+        margin-bottom: 22px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        padding: 18px;
+    }
+
+    .stat-value {
         font-size: 28px;
+        margin-top: 12px;
+    }
+
+    .panel-header, .panel-body {
+        padding: 17px;
+    }
+
+    .table-tools {
+        padding: 15px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .campo-completo {
+        grid-column: auto;
+    }
+
+    .refresh-text {
+        display: none;
+    }
+}
+
+@media (max-width: 420px) {
+    .topbar {
+        flex-direction: column;
+    }
+
+    .topbar .btn {
+        width: 100%;
+    }
+
+    .resumen {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .producto {
+        padding: 12px;
     }
 }
 </style>
 </head>
 
 <body>
-<main>
 
-<h1>📋 Pedidos registrados</h1>
+<div class="app">
 
-<div class="barra">
-    <button id="actualizar" onclick="cargarPedidos()">
-        Actualizar pedidos
-    </button>
-
-    <span id="estado">Consultando Google Sheets...</span>
-</div>
-
-<section class="panel">
-    <h2>🧾 Total general de pedidos</h2>
-
-    <p id="totalGeneral" class="total-general">$0.00</p>
-
-    <p>
-        Pedidos registrados:
-        <strong id="cantidadPedidos">0</strong>
-    </p>
-</section>
-
-<section class="panel">
-    <h2>📦 Resumen por producto</h2>
-
-    <p>Unidades solicitadas en todos los pedidos registrados.</p>
-
-    <div id="resumen" class="resumen">
-        <p>Cargando resumen...</p>
-    </div>
-</section>
-
-<section id="panelEdicion" class="panel" hidden>
-    <h2>✏️ Editar pedido</h2>
-
-    <p>
-        Si cambias el detalle, usa el formato:
-        cantidad x producto = $subtotal.
-    </p>
-
-    <form id="formEdicion">
-
-        <input type="hidden" id="filaPedido">
-
-        <label for="fechaPedido">Fecha y hora</label>
-        <input id="fechaPedido" type="text" required>
-
-        <label for="clientePedido">Cliente</label>
-        <input id="clientePedido" type="text" required>
-
-        <label for="totalPedido">Total ($)</label>
-        <input
-            id="totalPedido"
-            type="number"
-            min="0"
-            step="0.01"
-            required
-        >
-
-        <label for="detallePedido">Detalle del pedido</label>
-        <textarea id="detallePedido" rows="6" required></textarea>
-
-        <div class="form-acciones">
-            <button type="submit" class="btn-guardar">
-                Guardar cambios
-            </button>
-
-            <button
-                type="button"
-                class="btn-cancelar"
-                onclick="cancelarEdicion()"
-            >
-                Cancelar
-            </button>
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">🧡</div>
+            <div>
+                <div class="brand-name">VUALAS</div>
+                <div class="brand-subtitle">Panel de administración</div>
+            </div>
         </div>
 
-    </form>
-</section>
+        <div class="menu-label">MENÚ PRINCIPAL</div>
 
-<div class="tabla-contenedor">
-    <table>
-        <thead>
-            <tr>
-                <th>Fecha</th>
-                <th>Cliente</th>
-                <th>Total</th>
-                <th>Detalle</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
+        <a class="menu-item active" href="#inicio">▦ &nbsp; Resumen</a>
+        <a class="menu-item" href="#pedidos">▤ &nbsp; Pedidos</a>
+        <a class="menu-item" href="#productos">▧ &nbsp; Productos</a>
+        <a class="menu-item" href="index.html">↗ &nbsp; Ir al catálogo</a>
 
-        <tbody id="tablaPedidos">
-            <tr>
-                <td colspan="5">Cargando pedidos...</td>
-            </tr>
-        </tbody>
-    </table>
+        <div class="sidebar-bottom">
+            <strong>Vualas</strong><br>
+            Administración de pedidos<br>
+            Gestión de ventas
+        </div>
+    </aside>
+
+    <main class="main" id="inicio">
+
+        <header class="topbar">
+            <div>
+                <div class="eyebrow">Panel de control</div>
+                <h1>Pedidos</h1>
+                <p class="subtitle">
+                    Consulta y administra los pedidos de tus clientes.
+                </p>
+            </div>
+
+            <button id="actualizar" class="btn btn-primary"
+                    onclick="cargarPedidos()">
+                ↻ &nbsp; <span class="refresh-text">Actualizar pedidos</span>
+            </button>
+        </header>
+
+        <div class="stats">
+
+            <section class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-label">Total de ventas</span>
+                    <span class="stat-icon">💰</span>
+                </div>
+                <div id="totalGeneral" class="stat-value">$0.00</div>
+                <div class="stat-foot">Importe acumulado de los pedidos</div>
+            </section>
+
+            <section class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-label">Pedidos registrados</span>
+                    <span class="stat-icon">📦</span>
+                </div>
+                <div id="cantidadPedidos" class="stat-value">0</div>
+                <div class="stat-foot">Pedidos almacenados en Google Sheets</div>
+            </section>
+
+            <section class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-label">Estado de conexión</span>
+                    <span class="stat-icon">🔗</span>
+                </div>
+                <div id="estadoPrincipal" class="stat-value"
+                     style="font-size:23px">Consultando...</div>
+                <div class="stat-foot">
+                    <span class="status">
+                        <span id="puntoEstado" class="status-dot"></span>
+                        <span id="estado">Conectando con Google Sheets...</span>
+                    </span>
+                </div>
+            </section>
+
+        </div>
+
+        <section class="panel" id="productos">
+            <div class="panel-header">
+                <div>
+                    <h2 class="panel-title">Unidades por producto</h2>
+                    <p class="panel-description">
+                        Cantidades acumuladas de todos los pedidos.
+                    </p>
+                </div>
+                <span class="stat-icon">📊</span>
+            </div>
+
+            <div class="panel-body">
+                <div id="resumen" class="resumen">
+                    <p>Cargando productos...</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="panelEdicion" class="panel" hidden>
+            <div class="panel-header">
+                <div>
+                    <h2 class="panel-title">Editar pedido</h2>
+                    <p class="panel-description">
+                        Modifica los datos y guarda los cambios.
+                    </p>
+                </div>
+            </div>
+
+            <div class="panel-body">
+                <form id="formEdicion">
+                    <input type="hidden" id="filaPedido">
+
+                    <div class="form-grid">
+                        <div class="campo">
+                            <label for="fechaPedido">Fecha y hora</label>
+                            <input id="fechaPedido" type="text" required>
+                        </div>
+
+                        <div class="campo">
+                            <label for="clientePedido">Cliente</label>
+                            <input id="clientePedido" type="text" required>
+                        </div>
+
+                        <div class="campo">
+                            <label for="totalPedido">Total ($)</label>
+                            <input id="totalPedido" type="number"
+                                   min="0" step="0.01" required>
+                        </div>
+
+                        <div class="campo campo-completo">
+                            <label for="detallePedido">Detalle del pedido</label>
+                            <textarea id="detallePedido"
+                                      rows="6" required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success">
+                            Guardar cambios
+                        </button>
+                        <button type="button" class="btn btn-secondary"
+                                onclick="cancelarEdicion()">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <section class="panel" id="pedidos">
+            <div class="panel-header">
+                <div>
+                    <h2 class="panel-title">Todos los pedidos</h2>
+                    <p class="panel-description">
+                        Consulta los detalles y administra cada pedido.
+                    </p>
+                </div>
+            </div>
+
+            <div class="table-tools">
+                <div class="search-box">
+                    <input id="busqueda"
+                           type="search"
+                           placeholder="Buscar por cliente, fecha o producto..."
+                           aria-label="Buscar pedidos"
+                           oninput="filtrarPedidos()">
+                </div>
+
+                <span id="contadorTabla" class="result-count">
+                    0 pedidos
+                </span>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Total</th>
+                            <th>Detalle del pedido</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tablaPedidos">
+                        <tr>
+                            <td colspan="5" class="table-message">
+                                Cargando pedidos...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="footer">
+            Vualas · Panel de administración de pedidos
+        </div>
+
+    </main>
 </div>
-
-<a class="volver" href="index.html">Volver al catálogo</a>
-
-</main>
 
 <script>
 const URL_GOOGLE_SHEETS =
@@ -332,7 +860,6 @@ let pedidosActuales = [];
 
 function crearCelda(texto, clase = "") {
     const celda = document.createElement("td");
-
     celda.textContent = texto ?? "";
 
     if (clase) {
@@ -366,21 +893,35 @@ function formatoMoneda(valor) {
 
 function crearFilaMensaje(mensaje) {
     const fila = document.createElement("tr");
-    const celda = crearCelda(mensaje);
-
+    const celda = crearCelda(mensaje, "table-message");
     celda.colSpan = 5;
     fila.appendChild(celda);
-
     return fila;
+}
+
+function actualizarEstado(mensaje, tipo = "") {
+    document.getElementById("estado").textContent = mensaje;
+
+    const punto = document.getElementById("puntoEstado");
+    punto.className = "status-dot";
+
+    if (tipo === "ok") {
+        punto.classList.add("ok");
+        document.getElementById("estadoPrincipal").textContent = "Conectado";
+    } else if (tipo === "error") {
+        punto.classList.add("error");
+        document.getElementById("estadoPrincipal").textContent = "Error";
+    } else {
+        document.getElementById("estadoPrincipal").textContent = "Consultando...";
+    }
 }
 
 async function cargarPedidos() {
     const boton = document.getElementById("actualizar");
-    const estado = document.getElementById("estado");
     const tabla = document.getElementById("tablaPedidos");
 
     boton.disabled = true;
-    estado.textContent = "Consultando pedidos...";
+    actualizarEstado("Consultando pedidos...");
 
     try {
         const respuesta = await fetch(
@@ -395,76 +936,32 @@ async function cargarPedidos() {
 
         if (!Array.isArray(pedidos)) {
             throw new Error(
-                pedidos.error || "La respuesta no contiene pedidos."
+                pedidos.error || "La respuesta no contiene una lista de pedidos."
             );
         }
 
         pedidosActuales = pedidos;
 
         generarResumen(pedidos);
+        filtrarPedidos();
 
-        tabla.replaceChildren();
-
-        if (pedidos.length === 0) {
-            tabla.appendChild(
-                crearFilaMensaje("Todavía no hay pedidos.")
-            );
-        } else {
-            pedidos.slice().reverse().forEach(pedido => {
-                const fila = document.createElement("tr");
-
-                fila.appendChild(
-                    crearCelda(pedido.fecha || "")
-                );
-
-                fila.appendChild(
-                    crearCelda(pedido.cliente || "")
-                );
-
-                fila.appendChild(
-                    crearCelda(
-                        formatoMoneda(pedido.total),
-                        "total"
-                    )
-                );
-
-                fila.appendChild(
-                    crearCelda(pedido.detalle || "", "detalle")
-                );
-
-                const acciones = crearCelda();
-                acciones.className = "acciones";
-
-                const editar = document.createElement("button");
-                editar.textContent = "Editar";
-                editar.onclick = () => iniciarEdicion(pedido);
-
-                const eliminar = document.createElement("button");
-                eliminar.textContent = "Eliminar";
-                eliminar.className = "btn-eliminar";
-                eliminar.onclick = () => eliminarPedido(pedido);
-
-                acciones.append(editar, eliminar);
-                fila.appendChild(acciones);
-
-                tabla.appendChild(fila);
-            });
-        }
-
-        estado.textContent =
-            pedidos.length + " pedido(s) consultado(s).";
+        actualizarEstado(
+            pedidos.length + " pedido(s) consultado(s).",
+            "ok"
+        );
 
     } catch (error) {
         tabla.replaceChildren();
-
         tabla.appendChild(
             crearFilaMensaje(
                 "No se pudieron cargar los pedidos: " + error.message
             )
         );
 
-        estado.textContent =
-            "Error al consultar Google Sheets: " + error.message;
+        document.getElementById("contadorTabla").textContent =
+            "No disponibles";
+
+        actualizarEstado("Error al consultar Google Sheets", "error");
 
     } finally {
         boton.disabled = false;
@@ -489,7 +986,6 @@ function generarResumen(pedidos) {
         const lineas = String(pedido.detalle || "").split(/\r?\n/);
 
         lineas.forEach(linea => {
-            // Ejemplo: 2 x Chetos Extreme = $30
             const coincidencia = linea.match(
                 /^\s*(\d+(?:[.,]\d+)?)\s*x\s*(.+?)\s*=\s*\$\s*[\d,.]+\s*$/i
             );
@@ -516,7 +1012,6 @@ function generarResumen(pedidos) {
     });
 
     const resumen = document.getElementById("resumen");
-
     resumen.replaceChildren();
 
     if (cantidades.size === 0) {
@@ -524,7 +1019,7 @@ function generarResumen(pedidos) {
 
         mensaje.textContent = pedidos.length === 0
             ? "Todavía no hay productos registrados."
-            : "No se encontraron cantidades. Revisa que el detalle tenga líneas como: 2 x Chetos Extreme = $30";
+            : "No se encontraron cantidades. Revisa el formato del detalle de los pedidos.";
 
         resumen.appendChild(mensaje);
         return;
@@ -537,18 +1032,92 @@ function generarResumen(pedidos) {
             tarjeta.className = "producto";
 
             const nombre = document.createElement("div");
+            nombre.className = "producto-nombre";
             nombre.textContent = producto;
 
             const numero = document.createElement("div");
             numero.className = "cantidad";
             numero.textContent = cantidad.toLocaleString("es-MX");
 
-            const etiqueta = document.createElement("div");
-            etiqueta.textContent = "unidades";
+            const unidad = document.createElement("div");
+            unidad.className = "producto-unidad";
+            unidad.textContent = "unidades solicitadas";
 
-            tarjeta.append(nombre, numero, etiqueta);
+            tarjeta.append(nombre, numero, unidad);
             resumen.appendChild(tarjeta);
         });
+}
+
+function filtrarPedidos() {
+    const busqueda = document.getElementById("busqueda").value
+        .trim()
+        .toLocaleLowerCase("es-MX");
+
+    const filtrados = pedidosActuales.filter(pedido => {
+        const texto = [
+            pedido.fecha,
+            pedido.cliente,
+            pedido.total,
+            pedido.detalle
+        ].join(" ").toLocaleLowerCase("es-MX");
+
+        return texto.includes(busqueda);
+    });
+
+    const tabla = document.getElementById("tablaPedidos");
+    tabla.replaceChildren();
+
+    document.getElementById("contadorTabla").textContent =
+        filtrados.length + (filtrados.length === 1 ? " pedido" : " pedidos");
+
+    if (filtrados.length === 0) {
+        tabla.appendChild(
+            crearFilaMensaje(
+                pedidosActuales.length === 0
+                    ? "Todavía no hay pedidos registrados."
+                    : "No se encontraron pedidos con esa búsqueda."
+            )
+        );
+        return;
+    }
+
+    filtrados.slice().reverse().forEach(pedido => {
+        const fila = document.createElement("tr");
+
+        fila.appendChild(
+            crearCelda(pedido.fecha || "—", "fecha")
+        );
+
+        const cliente = crearCelda(pedido.cliente || "Sin nombre");
+        cliente.className = "cliente-nombre";
+        fila.appendChild(cliente);
+
+        fila.appendChild(
+            crearCelda(formatoMoneda(pedido.total), "total")
+        );
+
+        fila.appendChild(
+            crearCelda(pedido.detalle || "Sin detalle", "detalle")
+        );
+
+        const acciones = crearCelda();
+        acciones.className = "acciones";
+
+        const editar = document.createElement("button");
+        editar.className = "btn btn-secondary btn-small";
+        editar.textContent = "Editar";
+        editar.onclick = () => iniciarEdicion(pedido);
+
+        const eliminar = document.createElement("button");
+        eliminar.className = "btn btn-danger btn-small";
+        eliminar.textContent = "Eliminar";
+        eliminar.onclick = () => eliminarPedido(pedido);
+
+        acciones.append(editar, eliminar);
+        fila.appendChild(acciones);
+
+        tabla.appendChild(fila);
+    });
 }
 
 function iniciarEdicion(pedido) {
@@ -557,40 +1126,32 @@ function iniciarEdicion(pedido) {
             "Este pedido no tiene número de fila. " +
             "Revisa la implementación de Apps Script."
         );
-
         return;
     }
 
     document.getElementById("filaPedido").value = pedido.fila;
-
-    document.getElementById("fechaPedido").value =
-        pedido.fecha || "";
-
-    document.getElementById("clientePedido").value =
-        pedido.cliente || "";
-
+    document.getElementById("fechaPedido").value = pedido.fecha || "";
+    document.getElementById("clientePedido").value = pedido.cliente || "";
     document.getElementById("totalPedido").value =
         convertirNumero(pedido.total);
-
     document.getElementById("detallePedido").value =
         pedido.detalle || "";
 
     document.getElementById("panelEdicion").hidden = false;
 
     document.getElementById("panelEdicion").scrollIntoView({
-        behavior: "smooth"
+        behavior: "smooth",
+        block: "start"
     });
 }
 
 function cancelarEdicion() {
     document.getElementById("formEdicion").reset();
-
     document.getElementById("panelEdicion").hidden = true;
 }
 
 async function enviarAccion(datos) {
     const cuerpo = new URLSearchParams();
-
     cuerpo.set("payload", JSON.stringify(datos));
 
     await fetch(URL_GOOGLE_SHEETS, {
@@ -611,40 +1172,26 @@ document.getElementById("formEdicion").addEventListener(
         try {
             await enviarAccion({
                 accion: "editar",
-
                 fila: Number(
                     document.getElementById("filaPedido").value
                 ),
-
                 fecha: document.getElementById("fechaPedido").value,
-
-                cliente: document.getElementById(
-                    "clientePedido"
-                ).value.trim(),
-
+                cliente: document.getElementById("clientePedido").value.trim(),
                 total: Number(
                     document.getElementById("totalPedido").value
                 ),
-
-                detalle: document.getElementById(
-                    "detallePedido"
-                ).value
+                detalle: document.getElementById("detallePedido").value
             });
 
             cancelarEdicion();
 
-            document.getElementById("estado").textContent =
-                "Solicitud enviada. Verificando cambios...";
+            actualizarEstado("Solicitud enviada. Verificando cambios...");
 
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
+            await new Promise(resolve => setTimeout(resolve, 1800));
             await cargarPedidos();
 
         } catch (error) {
-            alert(
-                "No se pudo enviar la solicitud: " + error.message
-            );
-
+            alert("No se pudo enviar la solicitud: " + error.message);
         } finally {
             boton.disabled = false;
         }
@@ -673,21 +1220,17 @@ async function eliminarPedido(pedido) {
             fila: Number(pedido.fila)
         });
 
-        document.getElementById("estado").textContent =
-            "Solicitud enviada. Verificando eliminación...";
+        actualizarEstado("Solicitud enviada. Verificando eliminación...");
 
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
+        await new Promise(resolve => setTimeout(resolve, 1800));
         await cargarPedidos();
 
     } catch (error) {
-        alert(
-            "No se pudo enviar la solicitud: " + error.message
-        );
+        alert("No se pudo enviar la solicitud: " + error.message);
     }
 }
 
-// Cargar pedidos al abrir la página
+// Cargar pedidos al abrir la página.
 cargarPedidos();
 </script>
 
