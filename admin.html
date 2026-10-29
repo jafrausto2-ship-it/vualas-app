@@ -1,647 +1,695 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Administración de Pedidos Vualas</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Administración de Pedidos Vualas</title>
 
-    <style>
-        body {
-            font-family: "Segoe UI", Arial, sans-serif;
-            margin: 20px;
-            background: #f5f5f5;
-            color: #333;
-        }
+<style>
+* {
+    box-sizing: border-box;
+}
 
-        h1, h2 {
-            color: #ff7b00;
-        }
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    margin: 20px;
+    background: #f5f5f5;
+    color: #333;
+    line-height: 1.45;
+}
 
-        .barra {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            align-items: center;
-            margin-bottom: 16px;
-        }
+h1, h2 {
+    color: #ff7b00;
+}
 
-        button, .volver {
-            padding: 10px 15px;
-            border: 0;
-            border-radius: 8px;
-            background: #ff7b00;
-            color: white;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 14px;
-        }
+h1 {
+    margin-bottom: 18px;
+}
 
-        button:disabled {
-            opacity: .6;
-            cursor: wait;
-        }
+.barra {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 16px;
+}
 
-        .btn-eliminar {
-            background: #c62828;
-        }
+button, .volver {
+    padding: 10px 15px;
+    border: 0;
+    border-radius: 8px;
+    background: #ff7b00;
+    color: white;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+    display: inline-block;
+}
 
-        .btn-cancelar {
-            background: #666;
-        }
+button:hover, .volver:hover {
+    filter: brightness(.94);
+}
 
-        .btn-guardar {
-            background: #238636;
-        }
+button:disabled {
+    opacity: .6;
+    cursor: wait;
+}
 
-        #estado {
-            color: #555;
-        }
+.btn-eliminar {
+    background: #c62828;
+}
 
-        .panel {
-            background: white;
-            border-radius: 8px;
-            padding: 16px;
-            margin: 20px 0;
-            box-shadow: 0 1px 4px #ddd;
-        }
+.btn-cancelar {
+    background: #666;
+}
 
-        .total-general {
-            font-size: 34px;
-            font-weight: bold;
-            color: #ff7b00;
-            margin: 12px 0;
-        }
+.btn-guardar {
+    background: #238636;
+}
 
-        .tabla-contenedor {
-            overflow-x: auto;
-            background: white;
-            border-radius: 8px;
-        }
+#estado {
+    color: #555;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
+.panel {
+    background: white;
+    border-radius: 10px;
+    padding: 18px;
+    margin: 20px 0;
+    box-shadow: 0 1px 4px #ddd;
+}
 
-        th {
-            background: #ff7b00;
-            color: white;
-            padding: 12px;
-            text-align: left;
-        }
+.total-general {
+    font-size: 34px;
+    font-weight: bold;
+    color: #ff7b00;
+    margin: 12px 0;
+}
 
-        td {
-            border-bottom: 1px solid #ddd;
-            padding: 12px;
-            vertical-align: top;
-        }
+.tabla-contenedor {
+    overflow-x: auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px #ddd;
+}
 
-        .total {
-            text-align: right;
-            white-space: nowrap;
-            font-weight: bold;
-        }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    min-width: 760px;
+}
 
-        .detalle {
-            white-space: pre-wrap;
-            min-width: 220px;
-        }
+th {
+    background: #ff7b00;
+    color: white;
+    padding: 13px;
+    text-align: left;
+    white-space: nowrap;
+}
 
-        .acciones {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            min-width: 145px;
-        }
+td {
+    border-bottom: 1px solid #eee;
+    padding: 12px;
+    vertical-align: top;
+}
 
-        .acciones button {
-            padding: 8px 10px;
-        }
+tbody tr:nth-child(even) {
+    background: #fffaf5;
+}
 
-        .resumen {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-        }
+tbody tr:hover {
+    background: #fff0df;
+}
 
-        .producto {
-            border: 1px solid #eee;
-            border-radius: 8px;
-            padding: 12px;
-            background: #fffaf5;
-            overflow-wrap: anywhere;
-        }
+.total {
+    text-align: right;
+    white-space: nowrap;
+    font-weight: bold;
+    color: #333;
+}
 
-        .cantidad {
-            font-size: 24px;
-            font-weight: bold;
-            color: #ff7b00;
-            margin-top: 6px;
-        }
+.detalle {
+    white-space: pre-wrap;
+    min-width: 220px;
+    overflow-wrap: anywhere;
+}
 
-        label {
-            display: block;
-            margin-top: 12px;
-            font-weight: 600;
-        }
+.acciones {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    min-width: 145px;
+}
 
-        input, textarea {
-            box-sizing: border-box;
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font: inherit;
-        }
+.acciones button {
+    padding: 8px 10px;
+}
 
-        .form-acciones {
-            display: flex;
-            gap: 8px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
+.resumen {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
 
-        .volver {
-            display: inline-block;
-            margin-top: 20px;
-        }
+.producto {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 12px;
+    background: #fffaf5;
+    overflow-wrap: anywhere;
+}
 
-        @media (max-width: 600px) {
-            body {
-                margin: 12px;
-            }
+.cantidad {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff7b00;
+    margin-top: 6px;
+}
 
-            th, td {
-                padding: 8px;
-            }
+label {
+    display: block;
+    margin-top: 12px;
+    font-weight: 600;
+}
 
-            .total-general {
-                font-size: 28px;
-            }
-        }
-    </style>
+input, textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font: inherit;
+}
+
+.form-acciones {
+    display: flex;
+    gap: 8px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.volver {
+    margin-top: 20px;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 600px) {
+    body {
+        margin: 12px;
+    }
+
+    .panel {
+        padding: 13px;
+    }
+
+    th, td {
+        padding: 9px;
+    }
+
+    .total-general {
+        font-size: 28px;
+    }
+}
+</style>
 </head>
 
 <body>
-    <h1>📋 Pedidos registrados</h1>
+<main>
 
-    <div class="barra">
-        <button id="actualizar" onclick="cargarPedidos()">
-            Actualizar pedidos
-        </button>
-        <span id="estado">Consultando Google Sheets...</span>
+<h1>📋 Pedidos registrados</h1>
+
+<div class="barra">
+    <button id="actualizar" onclick="cargarPedidos()">
+        Actualizar pedidos
+    </button>
+
+    <span id="estado">Consultando Google Sheets...</span>
+</div>
+
+<section class="panel">
+    <h2>🧾 Total general de pedidos</h2>
+
+    <p id="totalGeneral" class="total-general">$0.00</p>
+
+    <p>
+        Pedidos registrados:
+        <strong id="cantidadPedidos">0</strong>
+    </p>
+</section>
+
+<section class="panel">
+    <h2>📦 Resumen por producto</h2>
+
+    <p>Unidades solicitadas en todos los pedidos registrados.</p>
+
+    <div id="resumen" class="resumen">
+        <p>Cargando resumen...</p>
     </div>
+</section>
 
-    <!-- TOTAL GENERAL -->
-    <section class="panel">
-        <h2>🧾 Total general de pedidos</h2>
+<section id="panelEdicion" class="panel" hidden>
+    <h2>✏️ Editar pedido</h2>
 
-        <p id="totalGeneral" class="total-general">$0.00</p>
+    <p>
+        Si cambias el detalle, usa el formato:
+        cantidad x producto = $subtotal.
+    </p>
 
-        <p>
-            Pedidos registrados:
-            <strong id="cantidadPedidos">0</strong>
-        </p>
-    </section>
+    <form id="formEdicion">
 
-    <!-- RESUMEN POR PRODUCTO -->
-    <section class="panel">
-        <h2>📦 Resumen por producto</h2>
-        <p>Unidades solicitadas en todos los pedidos registrados.</p>
+        <input type="hidden" id="filaPedido">
 
-        <div id="resumen" class="resumen">
-            <p>Cargando resumen...</p>
+        <label for="fechaPedido">Fecha y hora</label>
+        <input id="fechaPedido" type="text" required>
+
+        <label for="clientePedido">Cliente</label>
+        <input id="clientePedido" type="text" required>
+
+        <label for="totalPedido">Total ($)</label>
+        <input
+            id="totalPedido"
+            type="number"
+            min="0"
+            step="0.01"
+            required
+        >
+
+        <label for="detallePedido">Detalle del pedido</label>
+        <textarea id="detallePedido" rows="6" required></textarea>
+
+        <div class="form-acciones">
+            <button type="submit" class="btn-guardar">
+                Guardar cambios
+            </button>
+
+            <button
+                type="button"
+                class="btn-cancelar"
+                onclick="cancelarEdicion()"
+            >
+                Cancelar
+            </button>
         </div>
-    </section>
 
-    <!-- FORMULARIO DE EDICIÓN -->
-    <section id="panelEdicion" class="panel" hidden>
-        <h2>✏️ Editar pedido</h2>
+    </form>
+</section>
 
-        <p>
-            Si cambias el detalle, usa el formato:
-            cantidad x producto = $subtotal.
-        </p>
+<div class="tabla-contenedor">
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Total</th>
+                <th>Detalle</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
 
-        <form id="formEdicion">
-            <input type="hidden" id="filaPedido">
+        <tbody id="tablaPedidos">
+            <tr>
+                <td colspan="5">Cargando pedidos...</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
-            <label for="fechaPedido">Fecha y hora</label>
-            <input id="fechaPedido" type="text" required>
+<a class="volver" href="index.html">Volver al catálogo</a>
 
-            <label for="clientePedido">Cliente</label>
-            <input id="clientePedido" type="text" required>
+</main>
 
-            <label for="totalPedido">Total ($)</label>
-            <input id="totalPedido" type="number"
-                   min="0" step="0.01" required>
-
-            <label for="detallePedido">Detalle del pedido</label>
-            <textarea id="detallePedido" rows="6" required></textarea>
-
-            <div class="form-acciones">
-                <button type="submit" class="btn-guardar">
-                    Guardar cambios
-                </button>
-
-                <button type="button" class="btn-cancelar"
-                        onclick="cancelarEdicion()">
-                    Cancelar
-                </button>
-            </div>
-        </form>
-    </section>
-
-    <!-- TABLA DE PEDIDOS -->
-    <div class="tabla-contenedor">
-        <table>
-            <thead>
-                <tr>
-                    <th>Fecha</th>
-                    <th>Cliente</th>
-                    <th>Total</th>
-                    <th>Detalle</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-
-            <tbody id="tablaPedidos">
-                <tr>
-                    <td colspan="5">Cargando pedidos...</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <a class="volver" href="index.html">Volver al catálogo</a>
-
-    <script>
-        const URL_GOOGLE_SHEETS =
-            
+<script>
+const URL_GOOGLE_SHEETS =
+    
 "https://script.google.com/macros/s/AKfycbzgajAV7KXScTqtH1PE7EQXbOqa29unuxdFQkhJ5WURUewTrpwGv6cwK4S4nt74FTzuKw/exec";
 
-        let pedidosActuales = [];
+let pedidosActuales = [];
 
-        function crearCelda(texto, clase = "") {
-            const celda = document.createElement("td");
-            celda.textContent = texto;
+function crearCelda(texto, clase = "") {
+    const celda = document.createElement("td");
 
-            if (clase) {
-                celda.className = clase;
-            }
+    celda.textContent = texto ?? "";
 
-            return celda;
+    if (clase) {
+        celda.className = clase;
+    }
+
+    return celda;
+}
+
+function convertirNumero(valor) {
+    if (typeof valor === "number") {
+        return Number.isFinite(valor) ? valor : 0;
+    }
+
+    const numero = Number(
+        String(valor ?? "")
+            .replace(/\$/g, "")
+            .replace(/,/g, "")
+            .trim()
+    );
+
+    return Number.isFinite(numero) ? numero : 0;
+}
+
+function formatoMoneda(valor) {
+    return convertirNumero(valor).toLocaleString("es-MX", {
+        style: "currency",
+        currency: "MXN"
+    });
+}
+
+function crearFilaMensaje(mensaje) {
+    const fila = document.createElement("tr");
+    const celda = crearCelda(mensaje);
+
+    celda.colSpan = 5;
+    fila.appendChild(celda);
+
+    return fila;
+}
+
+async function cargarPedidos() {
+    const boton = document.getElementById("actualizar");
+    const estado = document.getElementById("estado");
+    const tabla = document.getElementById("tablaPedidos");
+
+    boton.disabled = true;
+    estado.textContent = "Consultando pedidos...";
+
+    try {
+        const respuesta = await fetch(
+            URL_GOOGLE_SHEETS + "?accion=pedidos&t=" + Date.now()
+        );
+
+        if (!respuesta.ok) {
+            throw new Error("Error HTTP " + respuesta.status);
         }
 
-        function fechaLegible(fecha) {
-            if (!fecha) return "";
-            return fecha;
-        }
+        const pedidos = await respuesta.json();
 
-        function convertirNumero(valor) {
-            if (typeof valor === "number") {
-                return Number.isFinite(valor) ? valor : 0;
-            }
-
-            const numero = Number(
-                String(valor ?? "")
-                    .replace(/\$/g, "")
-                    .replace(/,/g, "")
-                    .trim()
+        if (!Array.isArray(pedidos)) {
+            throw new Error(
+                pedidos.error || "La respuesta no contiene pedidos."
             );
-
-            return Number.isFinite(numero) ? numero : 0;
         }
 
-        function formatoMoneda(valor) {
-            return convertirNumero(valor).toLocaleString("es-MX", {
-                style: "currency",
-                currency: "MXN"
-            });
-        }
+        pedidosActuales = pedidos;
 
-        async function cargarPedidos() {
-            const boton = document.getElementById("actualizar");
-            const estado = document.getElementById("estado");
-            const tabla = document.getElementById("tablaPedidos");
+        generarResumen(pedidos);
 
-            boton.disabled = true;
-            estado.textContent = "Consultando pedidos...";
+        tabla.replaceChildren();
 
-            try {
-                const respuesta = await fetch(
-                    URL_GOOGLE_SHEETS + "?accion=pedidos&t=" + Date.now()
+        if (pedidos.length === 0) {
+            tabla.appendChild(
+                crearFilaMensaje("Todavía no hay pedidos.")
+            );
+        } else {
+            pedidos.slice().reverse().forEach(pedido => {
+                const fila = document.createElement("tr");
+
+                fila.appendChild(
+                    crearCelda(pedido.fecha || "")
                 );
 
-                if (!respuesta.ok) {
-                    throw new Error("Error HTTP " + respuesta.status);
-                }
+                fila.appendChild(
+                    crearCelda(pedido.cliente || "")
+                );
 
-                const pedidos = await respuesta.json();
-
-                if (!Array.isArray(pedidos)) {
-                    throw new Error(
-                        pedidos.error || "La respuesta no contiene pedidos."
-                    );
-                }
-
-                pedidosActuales = pedidos;
-
-                // Actualizar total y resumen
-                generarResumen(pedidos);
-
-                // Actualizar tabla
-                tabla.replaceChildren();
-
-                if (pedidos.length === 0) {
-                    tabla.appendChild(
-                        crearFilaMensaje("Todavía no hay pedidos.")
-                    );
-                } else {
-                    pedidos.slice().reverse().forEach(pedido => {
-                        const fila = document.createElement("tr");
-
-                        fila.appendChild(
-                            crearCelda(fechaLegible(pedido.fecha))
-                        );
-
-                        fila.appendChild(
-                            crearCelda(pedido.cliente || "")
-                        );
-
-                        fila.appendChild(
-                            crearCelda(
-                                formatoMoneda(pedido.total),
-                                "total"
-                            )
-                        );
-
-                        fila.appendChild(
-                            crearCelda(pedido.detalle || "", "detalle")
-                        );
-
-                        const acciones = crearCelda();
-                        acciones.className = "acciones";
-
-                        const editar = document.createElement("button");
-                        editar.textContent = "Editar";
-                        editar.onclick = () => iniciarEdicion(pedido);
-
-                        const eliminar = document.createElement("button");
-                        eliminar.textContent = "Eliminar";
-                        eliminar.className = "btn-eliminar";
-                        eliminar.onclick = () => eliminarPedido(pedido);
-
-                        acciones.append(editar, eliminar);
-                        fila.appendChild(acciones);
-                        tabla.appendChild(fila);
-                    });
-                }
-
-                estado.textContent =
-                    pedidos.length + " pedido(s) consultado(s).";
-
-            } catch (error) {
-                tabla.replaceChildren();
-
-                tabla.appendChild(
-                    crearFilaMensaje(
-                        "No se pudieron cargar los pedidos: " + error.message
+                fila.appendChild(
+                    crearCelda(
+                        formatoMoneda(pedido.total),
+                        "total"
                     )
                 );
 
-                estado.textContent =
-                    "Error al consultar Google Sheets: " + error.message;
-
-            } finally {
-                boton.disabled = false;
-            }
-        }
-
-        function crearFilaMensaje(mensaje) {
-            const fila = document.createElement("tr");
-            const celda = crearCelda(mensaje);
-
-            celda.colSpan = 5;
-            fila.appendChild(celda);
-
-            return fila;
-        }
-
-        function generarResumen(pedidos) {
-            const cantidades = new Map();
-
-            // Sumar el importe de todos los pedidos
-            const totalGeneral = pedidos.reduce(
-                (suma, pedido) => suma + convertirNumero(pedido.total),
-                0
-            );
-
-            document.getElementById("totalGeneral").textContent =
-                formatoMoneda(totalGeneral);
-
-            document.getElementById("cantidadPedidos").textContent =
-                pedidos.length.toLocaleString("es-MX");
-
-            // Sumar unidades de cada producto
-            pedidos.forEach(pedido => {
-                const detalle = pedido.detalle || "";
-                const lineas = detalle.split(/\r?\n/);
-
-                lineas.forEach(linea => {
-                    // Ejemplo: 2 x Chetos Extreme = $30
-                    const coincidencia = linea.match(
-                        /^\s*(\d+(?:[.,]\d+)?)\s*x\s*(.+?)\s*=\s*\$/
-                    );
-
-                    if (!coincidencia) return;
-
-                    const cantidad = Number(
-                        coincidencia[1].replace(",", ".")
-                    );
-
-                    const producto = coincidencia[2].trim();
-
-                    if (!producto || !Number.isFinite(cantidad)) {
-                        return;
-                    }
-
-                    cantidades.set(
-                        producto,
-                        (cantidades.get(producto) || 0) + cantidad
-                    );
-                });
-            });
-
-            const resumen = document.getElementById("resumen");
-            resumen.replaceChildren();
-
-            if (cantidades.size === 0) {
-                const mensaje = document.createElement("p");
-
-                mensaje.textContent = pedidos.length === 0
-                    ? "Todavía no hay productos registrados."
-                    : "No se encontraron cantidades. Revisa que el detalle " +
-                      "tenga líneas como: 2 x Chetos Extreme = $30";
-
-                resumen.appendChild(mensaje);
-                return;
-            }
-
-            [...cantidades.entries()]
-                .sort((a, b) => a[0].localeCompare(b[0], "es"))
-                .forEach(([producto, cantidad]) => {
-                    const tarjeta = document.createElement("div");
-                    tarjeta.className = "producto";
-
-                    const nombre = document.createElement("div");
-                    nombre.textContent = producto;
-
-                    const numero = document.createElement("div");
-                    numero.className = "cantidad";
-                    numero.textContent =
-                        cantidad.toLocaleString("es-MX");
-
-                    const etiqueta = document.createElement("div");
-                    etiqueta.textContent = "unidades";
-
-                    tarjeta.append(nombre, numero, etiqueta);
-                    resumen.appendChild(tarjeta);
-                });
-        }
-
-        function iniciarEdicion(pedido) {
-            if (!pedido.fila) {
-                alert(
-                    "Este pedido no tiene número de fila. " +
-                    "Revisa la implementación de Apps Script."
+                fila.appendChild(
+                    crearCelda(pedido.detalle || "", "detalle")
                 );
-                return;
-            }
 
-            document.getElementById("filaPedido").value = pedido.fila;
-            document.getElementById("fechaPedido").value =
-                pedido.fecha || "";
-            document.getElementById("clientePedido").value =
-                pedido.cliente || "";
-            document.getElementById("totalPedido").value =
-                convertirNumero(pedido.total);
-            document.getElementById("detallePedido").value =
-                pedido.detalle || "";
+                const acciones = crearCelda();
+                acciones.className = "acciones";
 
-            document.getElementById("panelEdicion").hidden = false;
+                const editar = document.createElement("button");
+                editar.textContent = "Editar";
+                editar.onclick = () => iniciarEdicion(pedido);
 
-            document.getElementById("panelEdicion").scrollIntoView({
-                behavior: "smooth"
+                const eliminar = document.createElement("button");
+                eliminar.textContent = "Eliminar";
+                eliminar.className = "btn-eliminar";
+                eliminar.onclick = () => eliminarPedido(pedido);
+
+                acciones.append(editar, eliminar);
+                fila.appendChild(acciones);
+
+                tabla.appendChild(fila);
             });
         }
 
-        function cancelarEdicion() {
-            document.getElementById("formEdicion").reset();
-            document.getElementById("panelEdicion").hidden = true;
-        }
+        estado.textContent =
+            pedidos.length + " pedido(s) consultado(s).";
 
-        async function enviarAccion(datos) {
-            const cuerpo = new URLSearchParams();
-            cuerpo.set("payload", JSON.stringify(datos));
+    } catch (error) {
+        tabla.replaceChildren();
 
-            await fetch(URL_GOOGLE_SHEETS, {
-                method: "POST",
-                mode: "no-cors",
-                body: cuerpo
-            });
-
-            // Se consulta nuevamente la hoja para verificar los cambios.
-        }
-
-        document.getElementById("formEdicion").addEventListener(
-            "submit",
-            async function(event) {
-                event.preventDefault();
-
-                const boton = this.querySelector('[type="submit"]');
-                boton.disabled = true;
-
-                try {
-                    await enviarAccion({
-                        accion: "editar",
-                        fila: Number(
-                            document.getElementById("filaPedido").value
-                        ),
-                        fecha: document.getElementById("fechaPedido").value,
-                        cliente: document.getElementById(
-                            "clientePedido"
-                        ).value.trim(),
-                        total: Number(
-                            document.getElementById("totalPedido").value
-                        ),
-                        detalle: document.getElementById(
-                            "detallePedido"
-                        ).value
-                    });
-
-                    cancelarEdicion();
-
-                    document.getElementById("estado").textContent =
-                        "Solicitud enviada. Verificando cambios...";
-
-                    await new Promise(resolve =>
-                        setTimeout(resolve, 1500)
-                    );
-
-                    await cargarPedidos();
-
-                } catch (error) {
-                    alert(
-                        "No se pudo enviar la solicitud: " + error.message
-                    );
-                } finally {
-                    boton.disabled = false;
-                }
-            }
+        tabla.appendChild(
+            crearFilaMensaje(
+                "No se pudieron cargar los pedidos: " + error.message
+            )
         );
 
-        async function eliminarPedido(pedido) {
-            if (!pedido.fila) {
-                alert("No se encontró el número de fila de este pedido.");
+        estado.textContent =
+            "Error al consultar Google Sheets: " + error.message;
+
+    } finally {
+        boton.disabled = false;
+    }
+}
+
+function generarResumen(pedidos) {
+    const cantidades = new Map();
+
+    const totalGeneral = pedidos.reduce(
+        (suma, pedido) => suma + convertirNumero(pedido.total),
+        0
+    );
+
+    document.getElementById("totalGeneral").textContent =
+        formatoMoneda(totalGeneral);
+
+    document.getElementById("cantidadPedidos").textContent =
+        pedidos.length.toLocaleString("es-MX");
+
+    pedidos.forEach(pedido => {
+        const lineas = String(pedido.detalle || "").split(/\r?\n/);
+
+        lineas.forEach(linea => {
+            // Ejemplo: 2 x Chetos Extreme = $30
+            const coincidencia = linea.match(
+                /^\s*(\d+(?:[.,]\d+)?)\s*x\s*(.+?)\s*=\s*\$\s*[\d,.]+\s*$/i
+            );
+
+            if (!coincidencia) {
                 return;
             }
 
-            const confirmar = confirm(
-                "¿Seguro que deseas eliminar el pedido de " +
-                (pedido.cliente || "este cliente") + "?\n\n" +
-                "Esta acción no se puede deshacer."
+            const cantidad = Number(
+                coincidencia[1].replace(",", ".")
             );
 
-            if (!confirmar) return;
+            const producto = coincidencia[2].trim();
 
-            try {
-                await enviarAccion({
-                    accion: "eliminar",
-                    fila: Number(pedido.fila)
-                });
-
-                document.getElementById("estado").textContent =
-                    "Solicitud enviada. Verificando eliminación...";
-
-                await new Promise(resolve =>
-                    setTimeout(resolve, 1500)
-                );
-
-                await cargarPedidos();
-
-            } catch (error) {
-                alert(
-                    "No se pudo enviar la solicitud: " + error.message
-                );
+            if (!producto || !Number.isFinite(cantidad)) {
+                return;
             }
-        }
 
-        // Cargar pedidos al abrir la página
-        cargarPedidos();
-    </script>
+            cantidades.set(
+                producto,
+                (cantidades.get(producto) || 0) + cantidad
+            );
+        });
+    });
+
+    const resumen = document.getElementById("resumen");
+
+    resumen.replaceChildren();
+
+    if (cantidades.size === 0) {
+        const mensaje = document.createElement("p");
+
+        mensaje.textContent = pedidos.length === 0
+            ? "Todavía no hay productos registrados."
+            : "No se encontraron cantidades. Revisa que el detalle tenga líneas como: 2 x Chetos Extreme = $30";
+
+        resumen.appendChild(mensaje);
+        return;
+    }
+
+    [...cantidades.entries()]
+        .sort((a, b) => a[0].localeCompare(b[0], "es"))
+        .forEach(([producto, cantidad]) => {
+            const tarjeta = document.createElement("div");
+            tarjeta.className = "producto";
+
+            const nombre = document.createElement("div");
+            nombre.textContent = producto;
+
+            const numero = document.createElement("div");
+            numero.className = "cantidad";
+            numero.textContent = cantidad.toLocaleString("es-MX");
+
+            const etiqueta = document.createElement("div");
+            etiqueta.textContent = "unidades";
+
+            tarjeta.append(nombre, numero, etiqueta);
+            resumen.appendChild(tarjeta);
+        });
+}
+
+function iniciarEdicion(pedido) {
+    if (!pedido.fila) {
+        alert(
+            "Este pedido no tiene número de fila. " +
+            "Revisa la implementación de Apps Script."
+        );
+
+        return;
+    }
+
+    document.getElementById("filaPedido").value = pedido.fila;
+
+    document.getElementById("fechaPedido").value =
+        pedido.fecha || "";
+
+    document.getElementById("clientePedido").value =
+        pedido.cliente || "";
+
+    document.getElementById("totalPedido").value =
+        convertirNumero(pedido.total);
+
+    document.getElementById("detallePedido").value =
+        pedido.detalle || "";
+
+    document.getElementById("panelEdicion").hidden = false;
+
+    document.getElementById("panelEdicion").scrollIntoView({
+        behavior: "smooth"
+    });
+}
+
+function cancelarEdicion() {
+    document.getElementById("formEdicion").reset();
+
+    document.getElementById("panelEdicion").hidden = true;
+}
+
+async function enviarAccion(datos) {
+    const cuerpo = new URLSearchParams();
+
+    cuerpo.set("payload", JSON.stringify(datos));
+
+    await fetch(URL_GOOGLE_SHEETS, {
+        method: "POST",
+        mode: "no-cors",
+        body: cuerpo
+    });
+}
+
+document.getElementById("formEdicion").addEventListener(
+    "submit",
+    async function(event) {
+        event.preventDefault();
+
+        const boton = this.querySelector('[type="submit"]');
+        boton.disabled = true;
+
+        try {
+            await enviarAccion({
+                accion: "editar",
+
+                fila: Number(
+                    document.getElementById("filaPedido").value
+                ),
+
+                fecha: document.getElementById("fechaPedido").value,
+
+                cliente: document.getElementById(
+                    "clientePedido"
+                ).value.trim(),
+
+                total: Number(
+                    document.getElementById("totalPedido").value
+                ),
+
+                detalle: document.getElementById(
+                    "detallePedido"
+                ).value
+            });
+
+            cancelarEdicion();
+
+            document.getElementById("estado").textContent =
+                "Solicitud enviada. Verificando cambios...";
+
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            await cargarPedidos();
+
+        } catch (error) {
+            alert(
+                "No se pudo enviar la solicitud: " + error.message
+            );
+
+        } finally {
+            boton.disabled = false;
+        }
+    }
+);
+
+async function eliminarPedido(pedido) {
+    if (!pedido.fila) {
+        alert("No se encontró el número de fila de este pedido.");
+        return;
+    }
+
+    const confirmar = confirm(
+        "¿Seguro que deseas eliminar el pedido de " +
+        (pedido.cliente || "este cliente") +
+        "?\n\nEsta acción no se puede deshacer."
+    );
+
+    if (!confirmar) {
+        return;
+    }
+
+    try {
+        await enviarAccion({
+            accion: "eliminar",
+            fila: Number(pedido.fila)
+        });
+
+        document.getElementById("estado").textContent =
+            "Solicitud enviada. Verificando eliminación...";
+
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        await cargarPedidos();
+
+    } catch (error) {
+        alert(
+            "No se pudo enviar la solicitud: " + error.message
+        );
+    }
+}
+
+// Cargar pedidos al abrir la página
+cargarPedidos();
+</script>
+
 </body>
 </html>
-```
